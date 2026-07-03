@@ -20,15 +20,22 @@
       align-items: center;
       justify-content: center;
     }
-    /* 게임 고정 비율 16:10(1280x800) 을 유지한 채 화면에 꽉 차게(contain) 맞춘다.
-       화면 비율이 16:10 과 다르면 남는 공간은 배경색(레터박스/필러박스) 으로 채워 잘리지 않게 한다.
-       세로 길이는 실제 보이는 뷰포트 높이(--vh, JS로 window.innerHeight 기반 계산)를 사용해
-       모바일 브라우저의 100vh(주소창 포함) 문제로 위아래가 잘리는 것을 막는다. */
+    /* 가로가 더 긴(또는 정사각) 화면: 가로를 항상 꽉 채우고(좌우 필러박스 없음),
+       세로는 게임 비율(16:10)로 계산하되 화면 높이를 넘지 않게 한다.
+       화면이 16:10 보다 세로로 여유가 있으면 위아래로 동일한 레터박스가 생긴다(세로 중앙 정렬).
+       세로 길이는 실제 보이는 뷰포트 높이(--vh)를 사용해 모바일 주소창 문제를 회피한다. */
     #unity-canvas {
-      width: min(100vw, calc(var(--vh, 1vh) * 100 * 1.6));
-      height: min(calc(var(--vh, 1vh) * 100), calc(100vw / 1.6));
-      background: #0a0a12;
+      width: 100vw;
+      height: min(calc(100vw / 1.6), calc(var(--vh, 1vh) * 100));
+      background: #000000;
       display: block;
+    }
+    /* 세로가 더 긴 화면: 16:10(1280x800) 기준을 버리고 세로전용 게임처럼 화면 전체를 채운다. */
+    @media (max-aspect-ratio: 1 / 1) {
+      #unity-canvas {
+        width: 100vw;
+        height: calc(var(--vh, 1vh) * 100);
+      }
     }
     #unity-loading-bar {
       position: absolute;
