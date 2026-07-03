@@ -78,6 +78,8 @@
     window.addEventListener("resize", setViewportHeight);
     window.addEventListener("orientationchange", setViewportHeight);
 
+    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
     var buildUrl = "Build";
     var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
     var config = {
@@ -88,24 +90,47 @@
       companyName: "{{{ COMPANY_NAME }}}",
       productName: "{{{ PRODUCT_NAME }}}",
       productVersion: "{{{ PRODUCT_VERSION }}}",
-      // 내부 렌더 해상도를 dpr 기준으로 올리되 최소 2배 슈퍼샘플링(비율 유지, 선명).
-      devicePixelRatio: Math.min(3, Math.max(2, window.devicePixelRatio || 1)),
+      // 모바일(특히 iOS)은 프레임버퍼/메모리 부담을 줄이려 dpr 을 1 로 고정, 데스크톱은 최대 2 배 슈퍼샘플링.
+      devicePixelRatio: isMobile ? 1 : Math.min(2, window.devicePixelRatio || 1),
     };
 
     var canvas = document.querySelector("#unity-canvas");
     var loadingBar = document.querySelector("#unity-loading-bar");
     var progressBarFull = document.querySelector("#unity-progress-bar-full");
 
+    // 로딩 실패 시 화면에 원인을 표시한다(iOS 등 콘솔 접근이 어려운 환경 진단용).
+    function showLoadError(message) {
+      loadingBar.style.display = "block";
+      loadingBar.innerHTML =
+        "<div style=\"color:#ff6b6b;max-width:82vw;word-break:break-word;white-space:pre-wrap;line-height:1.5;\">" +
+        "로딩 오류\n" + message + "</div>";
+    }
+    window.addEventListener("error", function (event) {
+      var location = event && event.filename ? "\n" + event.filename + ":" + event.lineno : "";
+      showLoadError((event && event.message ? event.message : "unknown error") + location);
+    });
+    window.addEventListener("unhandledrejection", function (event) {
+      var reason = event && event.reason;
+      showLoadError("promise: " + (reason && reason.message ? reason.message : reason));
+    });
+
     var script = document.createElement("script");
     script.src = loaderUrl;
+    script.onerror = function () {
+      showLoadError("로더 스크립트를 불러오지 못했습니다: " + loaderUrl);
+    };
     script.onload = () => {
-      createUnityInstance(canvas, config, (progress) => {
-        progressBarFull.style.width = (100 * progress) + "%";
-      }).then((unityInstance) => {
-        loadingBar.style.display = "none";
-      }).catch((message) => {
-        alert(message);
-      });
+      try {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = (100 * progress) + "%";
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+        }).catch((message) => {
+          showLoadError(message);
+        });
+      } catch (exception) {
+        showLoadError(exception && exception.message ? exception.message : ("" + exception));
+      }
     };
     document.body.appendChild(script);
   </script>
