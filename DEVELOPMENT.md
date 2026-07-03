@@ -71,7 +71,7 @@
 - 가로(또는 정사각) 화면: `width:100vw`, `height: min(100vw/1.6, vh*100)`. 가로를 항상 꽉 채우고(좌우 필러박스 없음), 남는 위아래는 동일한 레터박스(세로 중앙 정렬). 16:10 보다 넓은 화면은 좌우 바 없이 가로로 더 넓게 렌더(잘림 방지).
 - 세로 화면(`@media (max-aspect-ratio: 1/1)`): `width:100vw`, `height: vh*100`. 1280x800 기준을 버리고 화면 전체를 채워 세로전용 게임처럼 표시.
 - `--vh` 는 JS 로 `window.innerHeight` 기반 계산(모바일 주소창 대응).
-- devicePixelRatio: 모바일은 1 고정(프레임버퍼/메모리 부담 완화), 데스크톱은 최대 2.
+- devicePixelRatio: `window.devicePixelRatio` 그대로 사용해 내부 렌더 버퍼를 브라우저 실제 해상도에 맞춘다(특히 세로모드 저해상도 방지).
 - 로딩 실패 시 화면에 오류 메시지를 표시(iOS 등 콘솔 접근이 어려운 환경 진단용).
 
 ---
@@ -83,7 +83,7 @@
 - 이미시브 발광 + Bloom: 엔티티 머티리얼 `_EMISSION` 활성 + `_EmissionColor = white*2.5`, Global Volume 에 Bloom(threshold ~1.05).
 - 그림자/체력바/조이스틱 텍스처는 코드로 생성(`Textures/ShadowBlob.png`, `WhiteSquare.png`, `WhiteCircle.png`, `PlanetGround.png`).
 - 스프라이트로 쓸 텍스처는 임포터에서 `textureType=Sprite` 뿐 아니라 `spriteImportMode=Single` 까지 명시해야 Sprite 서브에셋이 생성됨. 리임포트 직후 `LoadAssetAtPath<Sprite>` 가 null 일 수 있으니 `ForceSynchronousImport` 후 재조회.
-- 바닥 타일 이음새 제거: Perlin 노이즈는 타일 경계에서 불연속 → 네 모서리를 스케일만큼 시프트해 이중선형 블렌드하는 타일러블 노이즈로 생성(경계가 이어짐).
+- 바닥 타일 이음새 제거: 격자 해시를 period 로 wrap 하는 주기적(타일러블) value noise 로 생성. (주의: 네 모서리를 전체 u,v 로 이중선형 블렌드하는 방식은 디테일이 뭉개지므로 쓰지 말 것)
 - 조이스틱은 Screen Space Overlay 캔버스(ConstantPixelSize) 라 포스트프로세싱(블룸) 영향 없음. 불투명(투명도 없음)으로 선명하게.
 - 체력바(HealthBar): 캐릭터 스케일이 바뀌어도 위치가 맞도록 `worldOffset` 을 `anchor.lossyScale` 로 스케일. 부모 요(yaw) 회전에 흔들리지 않게 LateUpdate 에서 월드 회전을 평면(Euler 90,0,0) 고정.
 

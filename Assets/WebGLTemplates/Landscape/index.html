@@ -78,8 +78,6 @@
     window.addEventListener("resize", setViewportHeight);
     window.addEventListener("orientationchange", setViewportHeight);
 
-    var isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
     var buildUrl = "Build";
     var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
     var config = {
@@ -90,8 +88,8 @@
       companyName: "{{{ COMPANY_NAME }}}",
       productName: "{{{ PRODUCT_NAME }}}",
       productVersion: "{{{ PRODUCT_VERSION }}}",
-      // 모바일(특히 iOS)은 프레임버퍼/메모리 부담을 줄이려 dpr 을 1 로 고정, 데스크톱은 최대 2 배 슈퍼샘플링.
-      devicePixelRatio: isMobile ? 1 : Math.min(2, window.devicePixelRatio || 1),
+      // 내부 렌더 버퍼를 브라우저 실제 해상도(devicePixelRatio)에 맞춘다.
+      devicePixelRatio: window.devicePixelRatio || 1,
     };
 
     var canvas = document.querySelector("#unity-canvas");
