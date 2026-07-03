@@ -67,5 +67,20 @@
         "*.sln": "*.csproj",
         "*.slnx": "*.csproj"
     },
-    "dotnet.defaultSolution": "planet-survival-unity.slnx"
+    "dotnet.defaultSolution": "planet-survival-unity.slnx",
+
+    "editor.insertSpaces": true,
+    "editor.tabSize": 4,
+    "terminal.integrated.showExitAlert": false,
+    "terminal.integrated.defaultProfile.windows": "Command Prompt",
+    "terminal.integrated.profiles.windows": {
+        "Command Prompt": {
+            "path": [
+                "${env:windir}\\System32\\cmd.exe",
+                "${env:windir}\\SysWOW64\\cmd.exe"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "terminal.integrated.defaultProfile.osx": "bash"
 }
