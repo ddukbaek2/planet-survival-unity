@@ -8,6 +8,7 @@ public class GameHUD : MonoBehaviour {
     [SerializeField] private TMP_Text levelLabel;
     [SerializeField] private TMP_Text healthLabel;
     [SerializeField] private TMP_Text fpsText;
+    [SerializeField] private TMP_Text statsText;
     [SerializeField] private PlayerHealth playerHealth;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TMP_Text resultText;
@@ -30,6 +31,12 @@ public class GameHUD : MonoBehaviour {
         smoothedFps = Mathf.Lerp(smoothedFps, 1f / deltaTime, 0.1f);
         if (fpsText != null) {
             fpsText.text = "FPS " + Mathf.RoundToInt(smoothedFps);
+        }
+        if (statsText != null) {
+            int activeEnemies = Enemy.ActiveCount;
+            int activeProjectiles = ProjectilePool.Instance != null ? ProjectilePool.Instance.GetActiveCount() : 0;
+            int totalProjectiles = ProjectilePool.Instance != null ? ProjectilePool.Instance.GetTotalCount() : 0;
+            statsText.text = "적 " + activeEnemies + "\n발사체 " + activeProjectiles + "\n풀 " + activeProjectiles + " / " + totalProjectiles;
         }
 
         if (playerHealth != null) {

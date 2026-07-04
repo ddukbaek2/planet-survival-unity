@@ -1,6 +1,8 @@
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
+    public static int ActiveCount;
+
     private int maxHealth = 2;
     private int currentHealth;
     private int attackPower = 1;
@@ -17,6 +19,7 @@ public class Enemy : MonoBehaviour {
         if (healthBar != null) {
             healthBar.SetRatio(1f);
         }
+        ActiveCount += 1;
     }
 
     public void ApplyDefinition(EnemyDefinition definition) {
@@ -86,6 +89,10 @@ public class Enemy : MonoBehaviour {
     }
 
     void OnDestroy() {
+        ActiveCount -= 1;
+        if (ActiveCount < 0) {
+            ActiveCount = 0;
+        }
         if (spawner != null) {
             spawner.NotifyEnemyRemoved();
         }

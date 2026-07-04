@@ -181,12 +181,18 @@ public class WeaponManager : MonoBehaviour {
     }
 
     void SpawnProjectile(Vector3 direction, int attackPower, Projectile.ProjectileMode projectileMode, int pierce, float explosion) {
-        if (projectilePrefab == null) {
-            return;
-        }
         Quaternion spawnRotation = Quaternion.LookRotation(direction);
-        GameObject projectileObject = Object.Instantiate(projectilePrefab, transform.position, spawnRotation);
-        Projectile projectile = projectileObject.GetComponent<Projectile>();
+        Projectile projectile;
+        if (ProjectilePool.Instance != null) {
+            projectile = ProjectilePool.Instance.Get(transform.position, spawnRotation);
+        }
+        else {
+            if (projectilePrefab == null) {
+                return;
+            }
+            GameObject projectileObject = Object.Instantiate(projectilePrefab, transform.position, spawnRotation);
+            projectile = projectileObject.GetComponent<Projectile>();
+        }
         if (projectile != null) {
             projectile.Configure(direction, attackPower, 18f, 3f, projectileMode, pierce, explosion);
         }

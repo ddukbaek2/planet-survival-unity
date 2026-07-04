@@ -18,8 +18,13 @@ public class Projectile : MonoBehaviour {
     private float elapsedTime;
     private bool boomerangReversed;
     private Transform homingTarget;
+    private ProjectilePool pool;
 
     private const float HomingTurnDegreesPerSecond = 240f;
+
+    public void SetPool(ProjectilePool value) {
+        pool = value;
+    }
 
     public void Configure(Vector3 direction, int attack, float projectileSpeed, float projectileLifeTime, ProjectileMode projectileMode, int pierce, float explosion) {
         moveDirection = direction.normalized;
@@ -29,6 +34,9 @@ public class Projectile : MonoBehaviour {
         mode = projectileMode;
         pierceRemaining = pierce;
         explosionRadius = explosion;
+        elapsedTime = 0f;
+        boomerangReversed = false;
+        homingTarget = null;
         transform.rotation = Quaternion.LookRotation(moveDirection);
     }
 
@@ -36,12 +44,12 @@ public class Projectile : MonoBehaviour {
         moveDirection = direction.normalized;
     }
 
-    void Start() {
-        Object.Destroy(gameObject, lifeTime);
-    }
-
     void Update() {
         elapsedTime += Time.deltaTime;
+        if (elapsedTime >= lifeTime) {
+            ReleaseSelf();
+            return;
+        }
         if (mode == ProjectileMode.Homing) {
             UpdateHoming();
         }
@@ -103,7 +111,7 @@ public class Projectile : MonoBehaviour {
             pierceRemaining -= 1;
             return;
         }
-        Object.Destroy(gameObject);
+        ReleaseSelf();
     }
 
     void Explode() {
@@ -116,6 +124,15 @@ public class Projectile : MonoBehaviour {
             if (enemy != null) {
                 enemy.ApplyHit(attackPower);
             }
+        }
+    }
+
+    void ReleaseSelf() {
+        if (pool != null) {
+            pool.Release(this);
+        }
+        else {
+            Object.Destroy(gameObject);
         }
     }
 }
