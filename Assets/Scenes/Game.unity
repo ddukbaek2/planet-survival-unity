@@ -269,7 +269,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: 1e7ac020793c2ae428cfad325cfe61a5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -616,6 +616,7 @@ MonoBehaviour:
   target: {fileID: 1902234896}
   smoothTime: 0.25
   height: 20
+  deadzoneRadius: 2.5
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0

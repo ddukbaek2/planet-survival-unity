@@ -30,10 +30,13 @@ public class PlayerController : MonoBehaviour {
         if (!isDragging) {
             isDragging = true;
             dragOrigin = pointerPosition;
-            ShowJoystick(dragOrigin);
         }
         Vector2 dragVector = pointerPosition - dragOrigin;
-        UpdateJoystickKnob(dragVector);
+        if (dragVector.magnitude > joystickRadius) {
+            dragVector = dragVector.normalized * joystickRadius;
+            dragOrigin = pointerPosition - dragVector;
+        }
+        UpdateJoystickVisual(dragVector);
         if (dragVector.magnitude < dragDeadzonePixels) {
             return;
         }
@@ -45,24 +48,18 @@ public class PlayerController : MonoBehaviour {
         transform.position = nextPosition;
     }
 
-    void ShowJoystick(Vector2 screenPosition) {
+    void UpdateJoystickVisual(Vector2 dragVector) {
         if (joystickBase == null) {
             return;
         }
-        joystickBase.gameObject.SetActive(true);
-        joystickBase.position = new Vector3(screenPosition.x, screenPosition.y, 0f);
+        if (!joystickBase.gameObject.activeSelf) {
+            joystickBase.gameObject.SetActive(true);
+        }
+        joystickBase.position = new Vector3(dragOrigin.x, dragOrigin.y, 0f);
         if (joystickKnob != null) {
-            joystickKnob.position = new Vector3(screenPosition.x, screenPosition.y, 0f);
+            Vector2 knobPosition = dragOrigin + dragVector;
+            joystickKnob.position = new Vector3(knobPosition.x, knobPosition.y, 0f);
         }
-    }
-
-    void UpdateJoystickKnob(Vector2 dragVector) {
-        if (joystickKnob == null) {
-            return;
-        }
-        Vector2 clampedVector = Vector2.ClampMagnitude(dragVector, joystickRadius);
-        Vector2 knobPosition = dragOrigin + clampedVector;
-        joystickKnob.position = new Vector3(knobPosition.x, knobPosition.y, 0f);
     }
 
     void HideJoystick() {
