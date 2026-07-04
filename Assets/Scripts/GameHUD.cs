@@ -3,8 +3,12 @@ using UnityEngine.UI;
 using TMPro;
 
 public class GameHUD : MonoBehaviour {
-    [SerializeField] private TMP_Text levelText;
+    [SerializeField] private RectTransform healthFill;
+    [SerializeField] private RectTransform experienceFill;
+    [SerializeField] private TMP_Text levelLabel;
+    [SerializeField] private TMP_Text healthLabel;
     [SerializeField] private TMP_Text fpsText;
+    [SerializeField] private PlayerHealth playerHealth;
     [SerializeField] private GameObject gameOverPanel;
     [SerializeField] private TMP_Text resultText;
     [SerializeField] private Button restartButton;
@@ -27,23 +31,47 @@ public class GameHUD : MonoBehaviour {
         if (fpsText != null) {
             fpsText.text = "FPS " + Mathf.RoundToInt(smoothedFps);
         }
+
+        if (playerHealth != null) {
+            int currentHealth = playerHealth.GetCurrentHealth();
+            int maxHealth = playerHealth.GetMaxHealth();
+            float healthRatio = maxHealth > 0 ? (float)currentHealth / maxHealth : 0f;
+            SetFill(healthFill, healthRatio);
+            if (healthLabel != null) {
+                healthLabel.text = "HP " + currentHealth + " / " + maxHealth;
+            }
+        }
+
         GameManager gameManager = GameManager.Instance;
         if (gameManager == null) {
             return;
         }
-        if (levelText != null) {
-            int currentLevel = gameManager.GetLevel();
-            int currentExperience = gameManager.GetExperience();
-            int requiredExperience = gameManager.GetRequiredExperience();
-            levelText.text = "Lv. " + currentLevel + "\nEXP " + currentExperience + " / " + requiredExperience;
+        int level = gameManager.GetLevel();
+        int experience = gameManager.GetExperience();
+        int requiredExperience = gameManager.GetRequiredExperience();
+        float experienceRatio = requiredExperience > 0 ? (float)experience / requiredExperience : 0f;
+        SetFill(experienceFill, experienceRatio);
+        if (levelLabel != null) {
+            levelLabel.text = "Lv. " + level + "   " + experience + " / " + requiredExperience;
         }
+
         bool isGameOver = gameManager.IsGameOver();
         if (gameOverPanel != null && gameOverPanel.activeSelf != isGameOver) {
             gameOverPanel.SetActive(isGameOver);
         }
         if (isGameOver && resultText != null) {
-            resultText.text = "도달 레벨: " + gameManager.GetLevel();
+            resultText.text = "도달 레벨: " + level;
         }
+    }
+
+    void SetFill(RectTransform fill, float ratio) {
+        if (fill == null) {
+            return;
+        }
+        float clampedRatio = Mathf.Clamp01(ratio);
+        Vector3 fillScale = fill.localScale;
+        fillScale.x = clampedRatio;
+        fill.localScale = fillScale;
     }
 
     public void OnRestartClicked() {

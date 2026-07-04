@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour {
 
     private int level;
     private int experience;
+    private int pendingLevelUps;
     private bool isGameOver;
 
     void Awake() {
@@ -16,6 +17,7 @@ public class GameManager : MonoBehaviour {
         Instance = this;
         level = 1;
         experience = 0;
+        pendingLevelUps = 0;
         isGameOver = false;
         Time.timeScale = 1f;
     }
@@ -36,6 +38,16 @@ public class GameManager : MonoBehaviour {
         return level * 10;
     }
 
+    public bool HasPendingLevelUp() {
+        return pendingLevelUps > 0;
+    }
+
+    public void ConsumeLevelUp() {
+        if (pendingLevelUps > 0) {
+            pendingLevelUps -= 1;
+        }
+    }
+
     public void AddKill() {
         if (isGameOver) {
             return;
@@ -44,6 +56,7 @@ public class GameManager : MonoBehaviour {
         while (experience >= GetRequiredExperience()) {
             experience -= GetRequiredExperience();
             level += 1;
+            pendingLevelUps += 1;
         }
     }
 

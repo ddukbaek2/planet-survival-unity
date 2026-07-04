@@ -18,6 +18,10 @@ public class PlayerHealth : MonoBehaviour {
         return currentHealth;
     }
 
+    public int GetMaxHealth() {
+        return maxHealth;
+    }
+
     public void TakeDamage(int amount) {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
