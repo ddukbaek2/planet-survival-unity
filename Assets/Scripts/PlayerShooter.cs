@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerShooter : MonoBehaviour {
@@ -6,6 +7,7 @@ public class PlayerShooter : MonoBehaviour {
     [SerializeField] private float targetingRange = 20f;
 
     private float fireTimer;
+    private readonly List<Enemy> enemiesInRange = new List<Enemy>();
 
     void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
@@ -15,30 +17,37 @@ public class PlayerShooter : MonoBehaviour {
         if (fireTimer > 0f) {
             return;
         }
-        Enemy nearestEnemy = FindNearestEnemy();
-        if (nearestEnemy == null) {
+        CollectEnemiesInRange();
+        if (enemiesInRange.Count == 0) {
             return;
         }
         fireTimer = fireInterval;
-        Vector3 targetPosition = nearestEnemy.transform.position;
-        FireAt(targetPosition);
+        int weaponCount = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
+        for (int index = 0; index < weaponCount; index++) {
+            Enemy target = enemiesInRange[index % enemiesInRange.Count];
+            Vector3 targetPosition = target.transform.position;
+            FireAt(targetPosition);
+        }
     }
 
-    Enemy FindNearestEnemy() {
+    void CollectEnemiesInRange() {
+        enemiesInRange.Clear();
         Enemy[] enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
-        Enemy nearestEnemy = null;
-        float nearestDistance = targetingRange;
         Vector3 currentPosition = transform.position;
         for (int index = 0; index < enemies.Length; index++) {
             Enemy candidateEnemy = enemies[index];
             Vector3 candidatePosition = candidateEnemy.transform.position;
             float distance = Vector3.Distance(currentPosition, candidatePosition);
-            if (distance < nearestDistance) {
-                nearestDistance = distance;
-                nearestEnemy = candidateEnemy;
+            if (distance <= targetingRange) {
+                enemiesInRange.Add(candidateEnemy);
             }
         }
-        return nearestEnemy;
+        Vector3 sortPosition = currentPosition;
+        enemiesInRange.Sort((first, second) => {
+            float firstDistance = (first.transform.position - sortPosition).sqrMagnitude;
+            float secondDistance = (second.transform.position - sortPosition).sqrMagnitude;
+            return firstDistance.CompareTo(secondDistance);
+        });
     }
 
     void FireAt(Vector3 targetPosition) {

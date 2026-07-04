@@ -4,7 +4,6 @@ public class Enemy : MonoBehaviour {
     [SerializeField] private float moveSpeed = 2.5f;
     [SerializeField] private int maxHealth = 2;
     [SerializeField] private int contactDamage = 1;
-    [SerializeField] private int scoreValue = 10;
 
     private int currentHealth;
     private Transform targetTransform;
@@ -55,7 +54,7 @@ public class Enemy : MonoBehaviour {
 
     void Die() {
         if (GameManager.Instance != null) {
-            GameManager.Instance.AddScore(scoreValue);
+            GameManager.Instance.AddKill();
         }
         Object.Destroy(gameObject);
     }

@@ -4,7 +4,8 @@ using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour {
     public static GameManager Instance { get; private set; }
 
-    private int score;
+    private int level;
+    private int experience;
     private bool isGameOver;
 
     void Awake() {
@@ -13,7 +14,8 @@ public class GameManager : MonoBehaviour {
             return;
         }
         Instance = this;
-        score = 0;
+        level = 1;
+        experience = 0;
         isGameOver = false;
         Time.timeScale = 1f;
     }
@@ -22,12 +24,27 @@ public class GameManager : MonoBehaviour {
         return isGameOver;
     }
 
-    public int GetScore() {
-        return score;
+    public int GetLevel() {
+        return level;
     }
 
-    public void AddScore(int amount) {
-        score += amount;
+    public int GetExperience() {
+        return experience;
+    }
+
+    public int GetRequiredExperience() {
+        return level * 10;
+    }
+
+    public void AddKill() {
+        if (isGameOver) {
+            return;
+        }
+        experience += 1;
+        while (experience >= GetRequiredExperience()) {
+            experience -= GetRequiredExperience();
+            level += 1;
+        }
     }
 
     public void GameOver() {
