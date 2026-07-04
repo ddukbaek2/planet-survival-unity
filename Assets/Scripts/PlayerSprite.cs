@@ -78,7 +78,7 @@ public class PlayerSprite : MonoBehaviour {
         if (facingDirection.sqrMagnitude < 0.0001f) {
             return 0;
         }
-        float angle = Mathf.Atan2(facingDirection.x, facingDirection.z) * Mathf.Rad2Deg;
+        float angle = Mathf.Atan2(-facingDirection.x, facingDirection.z) * Mathf.Rad2Deg;
         int sector = Mathf.RoundToInt(angle / 45f);
         sector = ((sector % 8) + 8) % 8;
         return RowForSector[sector];
