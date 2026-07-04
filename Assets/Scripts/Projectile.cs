@@ -9,7 +9,7 @@ public class Projectile : MonoBehaviour {
 
     private float speed = 18f;
     private float lifeTime = 3f;
-    private int damage = 1;
+    private int attackPower = 1;
     private int pierceRemaining;
     private float explosionRadius;
     private ProjectileMode mode = ProjectileMode.Straight;
@@ -21,9 +21,9 @@ public class Projectile : MonoBehaviour {
 
     private const float HomingTurnDegreesPerSecond = 240f;
 
-    public void Configure(Vector3 direction, int damageAmount, float projectileSpeed, float projectileLifeTime, ProjectileMode projectileMode, int pierce, float explosion) {
+    public void Configure(Vector3 direction, int attack, float projectileSpeed, float projectileLifeTime, ProjectileMode projectileMode, int pierce, float explosion) {
         moveDirection = direction.normalized;
-        damage = damageAmount;
+        attackPower = attack;
         speed = projectileSpeed;
         lifeTime = projectileLifeTime;
         mode = projectileMode;
@@ -94,7 +94,7 @@ public class Projectile : MonoBehaviour {
         }
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy != null) {
-            enemy.TakeDamage(damage);
+            enemy.ApplyHit(attackPower);
         }
         if (explosionRadius > 0f) {
             Explode();
@@ -114,7 +114,7 @@ public class Projectile : MonoBehaviour {
             }
             Enemy enemy = hits[index].GetComponent<Enemy>();
             if (enemy != null) {
-                enemy.TakeDamage(damage);
+                enemy.ApplyHit(attackPower);
             }
         }
     }

@@ -62,6 +62,8 @@ public class EnemySpawner : MonoBehaviour {
         GameObject enemyObject = Object.Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
         Enemy enemy = enemyObject.GetComponent<Enemy>();
         if (enemy != null) {
+            EnemyDefinition definition = EnemyTable.PickForTime(elapsedTime);
+            enemy.ApplyDefinition(definition);
             enemy.SetTarget(playerTransform);
             enemy.SetSpawner(this);
         }

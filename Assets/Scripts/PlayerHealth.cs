@@ -1,7 +1,9 @@
 using UnityEngine;
 
 public class PlayerHealth : MonoBehaviour {
-    [SerializeField] private int maxHealth = 5;
+    [SerializeField] private int maxHealth = 20;
+    [SerializeField] private int attackPower = 3;
+    [SerializeField] private int defense = 1;
 
     private int currentHealth;
     private HealthBar healthBar;
@@ -22,14 +24,20 @@ public class PlayerHealth : MonoBehaviour {
         return maxHealth;
     }
 
-    public void TakeDamage(int amount) {
+    public int GetAttackPower() {
+        return attackPower;
+    }
+
+    public void ApplyHit(int incomingAttack) {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
         }
-        currentHealth -= amount;
+        int damage = CombatFormula.ComputeDamage(incomingAttack, defense);
+        currentHealth -= damage;
         if (currentHealth < 0) {
             currentHealth = 0;
         }
+        CombatText.Show(transform.position, damage, new Color(1f, 0.4f, 0.4f));
         if (healthBar != null) {
             float ratio = (float)currentHealth / maxHealth;
             healthBar.SetRatio(ratio);

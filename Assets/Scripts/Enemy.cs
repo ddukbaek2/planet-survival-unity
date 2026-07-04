@@ -1,11 +1,12 @@
 using UnityEngine;
 
 public class Enemy : MonoBehaviour {
-    [SerializeField] private float moveSpeed = 2.5f;
-    [SerializeField] private int maxHealth = 2;
-    [SerializeField] private int contactDamage = 1;
-
+    private int maxHealth = 2;
     private int currentHealth;
+    private int attackPower = 1;
+    private int defense;
+    private float moveSpeed = 2.5f;
+
     private Transform targetTransform;
     private HealthBar healthBar;
     private EnemySpawner spawner;
@@ -13,6 +14,18 @@ public class Enemy : MonoBehaviour {
     void Awake() {
         currentHealth = maxHealth;
         healthBar = GetComponentInChildren<HealthBar>();
+        if (healthBar != null) {
+            healthBar.SetRatio(1f);
+        }
+    }
+
+    public void ApplyDefinition(EnemyDefinition definition) {
+        maxHealth = definition.health;
+        currentHealth = definition.health;
+        attackPower = definition.attack;
+        defense = definition.defense;
+        moveSpeed = definition.moveSpeed;
+        transform.localScale = new Vector3(definition.scale, definition.scale, definition.scale);
         if (healthBar != null) {
             healthBar.SetRatio(1f);
         }
@@ -41,8 +54,10 @@ public class Enemy : MonoBehaviour {
         transform.position = currentPosition + moveDirection * moveSpeed * Time.deltaTime;
     }
 
-    public void TakeDamage(int amount) {
-        currentHealth -= amount;
+    public void ApplyHit(int incomingAttack) {
+        int damage = CombatFormula.ComputeDamage(incomingAttack, defense);
+        currentHealth -= damage;
+        CombatText.Show(transform.position, damage, Color.white);
         if (healthBar != null) {
             float ratio = (float)currentHealth / maxHealth;
             healthBar.SetRatio(ratio);
@@ -65,7 +80,7 @@ public class Enemy : MonoBehaviour {
         }
         PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
         if (playerHealth != null) {
-            playerHealth.TakeDamage(contactDamage);
+            playerHealth.ApplyHit(attackPower);
         }
         Object.Destroy(gameObject);
     }

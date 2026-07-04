@@ -4,15 +4,15 @@ public class OrbitProjectile : MonoBehaviour {
     private Transform centerTransform;
     private float radius = 2.6f;
     private float angularSpeed = 200f;
-    private int damage = 1;
+    private int attackPower = 1;
     private float lifeTime = 4f;
     private float currentAngle;
 
-    public void Configure(Transform center, float orbitRadius, float degreesPerSecond, int damageAmount, float duration, float startAngle) {
+    public void Configure(Transform center, float orbitRadius, float degreesPerSecond, int attack, float duration, float startAngle) {
         centerTransform = center;
         radius = orbitRadius;
         angularSpeed = degreesPerSecond;
-        damage = damageAmount;
+        attackPower = attack;
         lifeTime = duration;
         currentAngle = startAngle;
     }
@@ -37,7 +37,7 @@ public class OrbitProjectile : MonoBehaviour {
         }
         Enemy enemy = other.GetComponent<Enemy>();
         if (enemy != null) {
-            enemy.TakeDamage(damage);
+            enemy.ApplyHit(attackPower);
         }
     }
 }

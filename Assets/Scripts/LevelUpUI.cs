@@ -8,6 +8,7 @@ public class LevelUpUI : MonoBehaviour {
     [SerializeField] private WeaponManager weaponManager;
     [SerializeField] private Button[] choiceButtons;
     [SerializeField] private Image[] choiceIcons;
+    [SerializeField] private TMP_Text[] choiceIconChars;
     [SerializeField] private TMP_Text[] choiceLabels;
 
     private readonly WeaponType[] currentChoices = new WeaponType[3];
@@ -59,6 +60,9 @@ public class LevelUpUI : MonoBehaviour {
             currentChoices[index] = weaponType;
             if (index < choiceIcons.Length && choiceIcons[index] != null) {
                 choiceIcons[index].color = WeaponDatabase.GetIconColor(weaponType);
+            }
+            if (index < choiceIconChars.Length && choiceIconChars[index] != null) {
+                choiceIconChars[index].text = WeaponDatabase.GetIconChar(weaponType);
             }
             if (index < choiceLabels.Length && choiceLabels[index] != null) {
                 int ownedLevel = weaponManager != null ? weaponManager.GetWeaponLevel(weaponType) : 0;

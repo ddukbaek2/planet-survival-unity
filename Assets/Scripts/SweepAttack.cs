@@ -2,14 +2,14 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SweepAttack : MonoBehaviour {
-    private int damage = 1;
+    private int attackPower = 1;
     private float maxRadius = 6f;
     private float duration = 0.3f;
     private float elapsedTime;
     private readonly HashSet<Enemy> hitEnemies = new HashSet<Enemy>();
 
-    public void Configure(int damageAmount, float radius, float sweepDuration) {
-        damage = damageAmount;
+    public void Configure(int attack, float radius, float sweepDuration) {
+        attackPower = attack;
         maxRadius = radius;
         duration = sweepDuration;
     }
@@ -28,7 +28,7 @@ public class SweepAttack : MonoBehaviour {
             Enemy enemy = hits[index].GetComponent<Enemy>();
             if (enemy != null && !hitEnemies.Contains(enemy)) {
                 hitEnemies.Add(enemy);
-                enemy.TakeDamage(damage);
+                enemy.ApplyHit(attackPower);
             }
         }
         if (progress >= 1f) {

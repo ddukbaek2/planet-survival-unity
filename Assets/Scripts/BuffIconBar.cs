@@ -7,12 +7,12 @@ public class BuffIconBar : MonoBehaviour {
     [SerializeField] private WeaponManager weaponManager;
     [SerializeField] private Sprite iconSprite;
     [SerializeField] private TMP_FontAsset fontAsset;
-    [SerializeField] private float iconSize = 40f;
+    [SerializeField] private float iconSize = 44f;
     [SerializeField] private float spacing = 8f;
 
     private int lastCount = -1;
     private readonly List<WeaponType> iconWeapons = new List<WeaponType>();
-    private readonly List<TMP_Text> iconLabels = new List<TMP_Text>();
+    private readonly List<TMP_Text> levelLabels = new List<TMP_Text>();
 
     void Update() {
         if (weaponManager == null) {
@@ -25,7 +25,7 @@ public class BuffIconBar : MonoBehaviour {
         }
         for (int index = 0; index < iconWeapons.Count; index++) {
             int weaponLevel = weaponManager.GetWeaponLevel(iconWeapons[index]);
-            iconLabels[index].text = weaponLevel.ToString();
+            levelLabels[index].text = "Lv" + weaponLevel;
         }
     }
 
@@ -34,7 +34,7 @@ public class BuffIconBar : MonoBehaviour {
             Object.Destroy(transform.GetChild(index).gameObject);
         }
         iconWeapons.Clear();
-        iconLabels.Clear();
+        levelLabels.Clear();
         for (int index = 0; index < ownedWeapons.Count; index++) {
             WeaponType weaponType = ownedWeapons[index];
             GameObject iconObject = new GameObject("Buff_" + weaponType, typeof(Image));
@@ -50,21 +50,37 @@ public class BuffIconBar : MonoBehaviour {
             iconRect.sizeDelta = new Vector2(iconSize, iconSize);
             iconRect.anchoredPosition = new Vector2(index * (iconSize + spacing), 0f);
 
-            GameObject labelObject = new GameObject("Level", typeof(TextMeshProUGUI));
-            labelObject.transform.SetParent(iconObject.transform, false);
-            TextMeshProUGUI label = labelObject.GetComponent<TextMeshProUGUI>();
-            label.font = fontAsset;
-            label.fontSize = 18f;
-            label.alignment = TextAlignmentOptions.BottomRight;
-            label.color = Color.black;
-            label.raycastTarget = false;
-            RectTransform labelRect = labelObject.GetComponent<RectTransform>();
-            labelRect.anchorMin = Vector2.zero;
-            labelRect.anchorMax = Vector2.one;
-            labelRect.offsetMin = new Vector2(2f, 2f);
-            labelRect.offsetMax = new Vector2(-3f, -2f);
+            GameObject charObject = new GameObject("Char", typeof(TextMeshProUGUI));
+            charObject.transform.SetParent(iconObject.transform, false);
+            TextMeshProUGUI charLabel = charObject.GetComponent<TextMeshProUGUI>();
+            charLabel.font = fontAsset;
+            charLabel.text = WeaponDatabase.GetIconChar(weaponType);
+            charLabel.fontSize = 24f;
+            charLabel.alignment = TextAlignmentOptions.Center;
+            charLabel.color = Color.black;
+            charLabel.raycastTarget = false;
+            RectTransform charRect = charObject.GetComponent<RectTransform>();
+            charRect.anchorMin = Vector2.zero;
+            charRect.anchorMax = Vector2.one;
+            charRect.offsetMin = Vector2.zero;
+            charRect.offsetMax = Vector2.zero;
+
+            GameObject levelObject = new GameObject("Level", typeof(TextMeshProUGUI));
+            levelObject.transform.SetParent(iconObject.transform, false);
+            TextMeshProUGUI levelLabel = levelObject.GetComponent<TextMeshProUGUI>();
+            levelLabel.font = fontAsset;
+            levelLabel.fontSize = 12f;
+            levelLabel.alignment = TextAlignmentOptions.BottomRight;
+            levelLabel.color = new Color(0.1f, 0.1f, 0.1f);
+            levelLabel.raycastTarget = false;
+            RectTransform levelRect = levelObject.GetComponent<RectTransform>();
+            levelRect.anchorMin = Vector2.zero;
+            levelRect.anchorMax = Vector2.one;
+            levelRect.offsetMin = new Vector2(2f, 1f);
+            levelRect.offsetMax = new Vector2(-2f, -1f);
+
             iconWeapons.Add(weaponType);
-            iconLabels.Add(label);
+            levelLabels.Add(levelLabel);
         }
     }
 }

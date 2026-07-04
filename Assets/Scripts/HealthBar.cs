@@ -6,27 +6,36 @@ public class HealthBar : MonoBehaviour {
 
     private Transform anchorTransform;
     private Transform fillTransform;
+    private Transform backgroundTransform;
     private static readonly Quaternion flatRotation = Quaternion.Euler(90f, 0f, 0f);
 
     void Awake() {
         anchorTransform = transform.parent;
         fillTransform = transform.Find("Fill");
+        backgroundTransform = transform.Find("Background");
     }
 
     public void SetRatio(float ratio) {
         if (fillTransform == null) {
             fillTransform = transform.Find("Fill");
         }
-        if (fillTransform == null) {
-            return;
+        if (backgroundTransform == null) {
+            backgroundTransform = transform.Find("Background");
         }
         float clampedRatio = Mathf.Clamp01(ratio);
-        Vector3 fillScale = fillTransform.localScale;
-        fillScale.x = barWidth * clampedRatio;
-        fillTransform.localScale = fillScale;
-        Vector3 fillPosition = fillTransform.localPosition;
-        fillPosition.x = -barWidth * 0.5f * (1f - clampedRatio);
-        fillTransform.localPosition = fillPosition;
+        bool visible = ratio > 0f && ratio < 1f;
+        if (backgroundTransform != null) {
+            backgroundTransform.gameObject.SetActive(visible);
+        }
+        if (fillTransform != null) {
+            fillTransform.gameObject.SetActive(visible);
+            Vector3 fillScale = fillTransform.localScale;
+            fillScale.x = barWidth * clampedRatio;
+            fillTransform.localScale = fillScale;
+            Vector3 fillPosition = fillTransform.localPosition;
+            fillPosition.x = -barWidth * 0.5f * (1f - clampedRatio);
+            fillTransform.localPosition = fillPosition;
+        }
     }
 
     void LateUpdate() {

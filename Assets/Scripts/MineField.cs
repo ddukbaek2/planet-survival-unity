@@ -1,15 +1,15 @@
 using UnityEngine;
 
 public class MineField : MonoBehaviour {
-    private int damage = 1;
+    private int attackPower = 1;
     private float radius = 2.6f;
     private float duration = 4f;
     private float tickInterval = 0.5f;
     private float lifeTimer;
     private float tickTimer;
 
-    public void Configure(int damageAmount, float fieldRadius, float fieldDuration, float interval) {
-        damage = damageAmount;
+    public void Configure(int attack, float fieldRadius, float fieldDuration, float interval) {
+        attackPower = attack;
         radius = fieldRadius;
         duration = fieldDuration;
         tickInterval = interval;
@@ -37,7 +37,7 @@ public class MineField : MonoBehaviour {
             }
             Enemy enemy = hits[index].GetComponent<Enemy>();
             if (enemy != null) {
-                enemy.TakeDamage(damage);
+                enemy.ApplyHit(attackPower);
             }
         }
     }

@@ -11,8 +11,10 @@ public class WeaponManager : MonoBehaviour {
     private readonly List<WeaponType> ownedWeapons = new List<WeaponType>();
     private readonly Dictionary<WeaponType, int> weaponLevels = new Dictionary<WeaponType, int>();
     private readonly Dictionary<WeaponType, float> cooldownTimers = new Dictionary<WeaponType, float>();
+    private PlayerHealth playerHealth;
 
     void Start() {
+        playerHealth = GetComponent<PlayerHealth>();
         AddWeapon(WeaponType.StraightShot);
     }
 
@@ -58,73 +60,34 @@ public class WeaponManager : MonoBehaviour {
     }
 
     float GetCooldown(WeaponType weaponType) {
-        float baseCooldown;
-        switch (weaponType) {
-            case WeaponType.StraightShot: {
-                baseCooldown = 0.5f;
-                break;
-            }
-            case WeaponType.AimedShot: {
-                baseCooldown = 0.5f;
-                break;
-            }
-            case WeaponType.HomingMissile: {
-                baseCooldown = 0.9f;
-                break;
-            }
-            case WeaponType.SpreadShot: {
-                baseCooldown = 0.8f;
-                break;
-            }
-            case WeaponType.NovaBurst: {
-                baseCooldown = 1.2f;
-                break;
-            }
-            case WeaponType.Boomerang: {
-                baseCooldown = 1.0f;
-                break;
-            }
-            case WeaponType.OrbitOrb: {
-                baseCooldown = 3.0f;
-                break;
-            }
-            case WeaponType.SweepSlash: {
-                baseCooldown = 1.5f;
-                break;
-            }
-            case WeaponType.Mine: {
-                baseCooldown = 1.5f;
-                break;
-            }
-            case WeaponType.ExplosiveShot: {
-                baseCooldown = 1.1f;
-                break;
-            }
-            default: {
-                baseCooldown = 1.0f;
-                break;
-            }
-        }
+        float baseCooldown = WeaponDatabase.GetCooldown(weaponType);
         int weaponLevel = GetWeaponLevel(weaponType);
         float scaledCooldown = baseCooldown * Mathf.Pow(0.9f, Mathf.Max(0, weaponLevel - 1));
         return Mathf.Max(0.1f, scaledCooldown);
     }
 
+    int GetAttackPower(WeaponType weaponType) {
+        int playerAttack = playerHealth != null ? playerHealth.GetAttackPower() : 3;
+        float multiplier = WeaponDatabase.GetDamageMultiplier(weaponType);
+        return Mathf.Max(1, Mathf.RoundToInt(playerAttack * multiplier));
+    }
+
     void FireWeapon(WeaponType weaponType, int weaponLevel) {
+        int attackPower = GetAttackPower(weaponType);
         switch (weaponType) {
             case WeaponType.StraightShot: {
                 Vector3 direction = GetForwardDirection();
-                SpawnProjectile(direction, Projectile.ProjectileMode.Straight, 0, 0f);
+                SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 break;
             }
             case WeaponType.AimedShot: {
                 Vector3 direction = GetNearestDirection();
-                SpawnProjectile(direction, Projectile.ProjectileMode.Straight, 0, 0f);
+                SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 break;
             }
             case WeaponType.HomingMissile: {
                 Vector3 direction = GetNearestDirection();
-                SpawnProjectile(direction, Projectile.ProjectileMode.Homing, 0, 0f);
+                SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Homing, 0, 0f);
                 break;
             }
             case WeaponType.SpreadShot: {
@@ -135,7 +98,7 @@ public class WeaponManager : MonoBehaviour {
                     float ratio = pelletCount == 1 ? 0f : ((float)index / (pelletCount - 1) - 0.5f);
                     float angle = ratio * spreadDegrees;
                     Vector3 pelletDirection = Quaternion.Euler(0f, angle, 0f) * direction;
-                    SpawnProjectile(pelletDirection, Projectile.ProjectileMode.Straight, 0, 0f);
+                    SpawnProjectile(pelletDirection, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 }
                 break;
             }
@@ -144,34 +107,34 @@ public class WeaponManager : MonoBehaviour {
                 for (int index = 0; index < novaCount; index++) {
                     float angle = 360f * index / novaCount;
                     Vector3 novaDirection = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
-                    SpawnProjectile(novaDirection, Projectile.ProjectileMode.Straight, 0, 0f);
+                    SpawnProjectile(novaDirection, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 }
                 break;
             }
             case WeaponType.Boomerang: {
                 Vector3 direction = GetNearestDirection();
-                SpawnProjectile(direction, Projectile.ProjectileMode.Boomerang, 999, 0f);
+                SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Boomerang, 999, 0f);
                 break;
             }
             case WeaponType.OrbitOrb: {
                 int orbCount = 1 + weaponLevel;
                 for (int index = 0; index < orbCount; index++) {
                     float startAngle = 360f * index / orbCount;
-                    SpawnOrbit(startAngle);
+                    SpawnOrbit(startAngle, attackPower);
                 }
                 break;
             }
             case WeaponType.SweepSlash: {
-                SpawnSweep(weaponLevel);
+                SpawnSweep(weaponLevel, attackPower);
                 break;
             }
             case WeaponType.Mine: {
-                SpawnMine();
+                SpawnMine(attackPower);
                 break;
             }
             case WeaponType.ExplosiveShot: {
                 Vector3 direction = GetNearestDirection();
-                SpawnProjectile(direction, Projectile.ProjectileMode.Straight, 0, 2.2f);
+                SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Straight, 0, 2.2f);
                 break;
             }
             default: {
@@ -217,7 +180,7 @@ public class WeaponManager : MonoBehaviour {
         return nearestEnemy;
     }
 
-    void SpawnProjectile(Vector3 direction, Projectile.ProjectileMode projectileMode, int pierce, float explosion) {
+    void SpawnProjectile(Vector3 direction, int attackPower, Projectile.ProjectileMode projectileMode, int pierce, float explosion) {
         if (projectilePrefab == null) {
             return;
         }
@@ -225,22 +188,22 @@ public class WeaponManager : MonoBehaviour {
         GameObject projectileObject = Object.Instantiate(projectilePrefab, transform.position, spawnRotation);
         Projectile projectile = projectileObject.GetComponent<Projectile>();
         if (projectile != null) {
-            projectile.Configure(direction, 1, 18f, 3f, projectileMode, pierce, explosion);
+            projectile.Configure(direction, attackPower, 18f, 3f, projectileMode, pierce, explosion);
         }
     }
 
-    void SpawnOrbit(float startAngle) {
+    void SpawnOrbit(float startAngle, int attackPower) {
         if (orbitPrefab == null) {
             return;
         }
         GameObject orbitObject = Object.Instantiate(orbitPrefab, transform.position, Quaternion.identity);
         OrbitProjectile orbit = orbitObject.GetComponent<OrbitProjectile>();
         if (orbit != null) {
-            orbit.Configure(transform, 2.6f, 200f, 1, 4f, startAngle);
+            orbit.Configure(transform, 2.6f, 200f, attackPower, 4f, startAngle);
         }
     }
 
-    void SpawnSweep(int weaponLevel) {
+    void SpawnSweep(int weaponLevel, int attackPower) {
         if (sweepPrefab == null) {
             return;
         }
@@ -250,11 +213,11 @@ public class WeaponManager : MonoBehaviour {
         SweepAttack sweep = sweepObject.GetComponent<SweepAttack>();
         if (sweep != null) {
             float sweepRadius = 5f + weaponLevel;
-            sweep.Configure(1, sweepRadius, 0.3f);
+            sweep.Configure(attackPower, sweepRadius, 0.3f);
         }
     }
 
-    void SpawnMine() {
+    void SpawnMine(int attackPower) {
         if (minePrefab == null) {
             return;
         }
@@ -263,7 +226,7 @@ public class WeaponManager : MonoBehaviour {
         GameObject mineObject = Object.Instantiate(minePrefab, spawnPosition, Quaternion.Euler(90f, 0f, 0f));
         MineField mine = mineObject.GetComponent<MineField>();
         if (mine != null) {
-            mine.Configure(1, 2.6f, 4f, 0.5f);
+            mine.Configure(attackPower, 2.6f, 4f, 0.5f);
         }
     }
 }

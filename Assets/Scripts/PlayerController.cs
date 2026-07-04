@@ -3,8 +3,6 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour {
     [SerializeField] private float moveSpeed = 8f;
-    [SerializeField] private float boundX = 31.5f;
-    [SerializeField] private float boundZ = 18.9f;
     [SerializeField] private float dragDeadzonePixels = 12f;
     [SerializeField] private RectTransform joystickBase;
     [SerializeField] private RectTransform joystickKnob;
@@ -43,8 +41,6 @@ public class PlayerController : MonoBehaviour {
         Vector3 moveDirection = new Vector3(dragDirection.x, 0f, dragDirection.y);
         transform.rotation = Quaternion.LookRotation(moveDirection);
         Vector3 nextPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
-        nextPosition.x = Mathf.Clamp(nextPosition.x, -boundX, boundX);
-        nextPosition.z = Mathf.Clamp(nextPosition.z, -boundZ, boundZ);
         nextPosition.y = transform.position.y;
         transform.position = nextPosition;
     }
