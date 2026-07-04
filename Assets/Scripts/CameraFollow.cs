@@ -2,29 +2,50 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour {
     [SerializeField] private Transform target;
-    [SerializeField] private float smoothTime = 0.15f;
     [SerializeField] private float height = 20f;
-    [SerializeField] private float deadzoneRadius = 2.5f;
+    [SerializeField] private float edgeMargin = 3f;
+    [SerializeField] private float followSmoothTime = 0.12f;
 
+    private Camera cameraComponent;
     private Vector3 followVelocity;
-    private Vector3 focusPoint;
-    private bool focusInitialized;
+
+    void Awake() {
+        cameraComponent = GetComponent<Camera>();
+    }
 
     void LateUpdate() {
         if (target == null) {
             return;
         }
-        Vector3 targetPosition = new Vector3(target.position.x, 0f, target.position.z);
-        if (!focusInitialized) {
-            focusPoint = targetPosition;
-            focusInitialized = true;
+        if (cameraComponent == null) {
+            cameraComponent = GetComponent<Camera>();
         }
-        Vector3 offset = targetPosition - focusPoint;
-        float distance = offset.magnitude;
-        if (distance > deadzoneRadius) {
-            focusPoint += offset.normalized * (distance - deadzoneRadius);
+        float halfHeight = cameraComponent.orthographicSize;
+        float halfWidth = halfHeight * cameraComponent.aspect;
+        float deadzoneX = Mathf.Max(0.5f, halfWidth - edgeMargin);
+        float deadzoneZ = Mathf.Max(0.5f, halfHeight - edgeMargin);
+
+        Vector3 cameraPosition = transform.position;
+        Vector3 targetPosition = target.position;
+        Vector3 desiredPosition = cameraPosition;
+
+        float offsetX = targetPosition.x - cameraPosition.x;
+        if (offsetX > deadzoneX) {
+            desiredPosition.x = targetPosition.x - deadzoneX;
         }
-        Vector3 desiredPosition = new Vector3(focusPoint.x, height, focusPoint.z);
-        transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref followVelocity, smoothTime);
+        else if (offsetX < -deadzoneX) {
+            desiredPosition.x = targetPosition.x + deadzoneX;
+        }
+
+        float offsetZ = targetPosition.z - cameraPosition.z;
+        if (offsetZ > deadzoneZ) {
+            desiredPosition.z = targetPosition.z - deadzoneZ;
+        }
+        else if (offsetZ < -deadzoneZ) {
+            desiredPosition.z = targetPosition.z + deadzoneZ;
+        }
+
+        desiredPosition.y = height;
+        transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref followVelocity, followSmoothTime);
     }
 }
