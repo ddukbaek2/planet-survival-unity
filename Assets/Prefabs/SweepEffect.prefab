@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3635932596781245903}
   - component: {fileID: 148152475520650398}
   - component: {fileID: 2668321677549246367}
+  - component: {fileID: 8416480566328046053}
   m_Layer: 0
   m_Name: SweepEffect
   m_TagString: Untagged
@@ -90,3 +91,15 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &8416480566328046053
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4954414667652414208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cc7bcd36335768f47a4d7e7a412d09ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SweepAttack
