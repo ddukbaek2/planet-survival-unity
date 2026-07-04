@@ -6,6 +6,8 @@ using TMPro;
 public class LevelUpUI : MonoBehaviour {
     [SerializeField] private GameObject panel;
     [SerializeField] private WeaponManager weaponManager;
+    [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private TMP_Text titleLabel;
     [SerializeField] private Button[] choiceButtons;
     [SerializeField] private Image[] choiceIcons;
     [SerializeField] private TMP_Text[] choiceIconChars;
@@ -13,6 +15,15 @@ public class LevelUpUI : MonoBehaviour {
 
     private readonly WeaponType[] currentChoices = new WeaponType[3];
     private bool isChoosing;
+    private bool isWeaponStage;
+
+    private static readonly string[] StatLabels = { "체력 +10", "공격력 +1", "방어력 +1" };
+    private static readonly string[] StatIconChars = { "체", "공", "방" };
+    private static readonly Color[] StatIconColors = {
+        new Color(0.5f, 1f, 0.5f),
+        new Color(1f, 0.5f, 0.5f),
+        new Color(0.5f, 0.7f, 1f)
+    };
 
     void Start() {
         for (int index = 0; index < choiceButtons.Length; index++) {
@@ -45,6 +56,32 @@ public class LevelUpUI : MonoBehaviour {
         if (panel != null) {
             panel.SetActive(true);
         }
+        ShowStatStage();
+    }
+
+    void ShowStatStage() {
+        isWeaponStage = false;
+        if (titleLabel != null) {
+            titleLabel.text = "레벨 업! 능력치 선택";
+        }
+        for (int index = 0; index < currentChoices.Length; index++) {
+            if (index < choiceIcons.Length && choiceIcons[index] != null) {
+                choiceIcons[index].color = StatIconColors[index];
+            }
+            if (index < choiceIconChars.Length && choiceIconChars[index] != null) {
+                choiceIconChars[index].text = StatIconChars[index];
+            }
+            if (index < choiceLabels.Length && choiceLabels[index] != null) {
+                choiceLabels[index].text = StatLabels[index];
+            }
+        }
+    }
+
+    void ShowWeaponStage() {
+        isWeaponStage = true;
+        if (titleLabel != null) {
+            titleLabel.text = "레벨 업! 무기 선택";
+        }
         RollChoices();
     }
 
@@ -73,6 +110,11 @@ public class LevelUpUI : MonoBehaviour {
     }
 
     void OnChoiceClicked(int index) {
+        if (!isWeaponStage) {
+            ApplyStatChoice(index);
+            ShowWeaponStage();
+            return;
+        }
         if (weaponManager != null) {
             weaponManager.AddWeapon(currentChoices[index]);
         }
@@ -80,7 +122,7 @@ public class LevelUpUI : MonoBehaviour {
             GameManager.Instance.ConsumeLevelUp();
         }
         if (GameManager.Instance != null && GameManager.Instance.HasPendingLevelUp()) {
-            RollChoices();
+            ShowStatStage();
             return;
         }
         if (panel != null) {
@@ -88,5 +130,28 @@ public class LevelUpUI : MonoBehaviour {
         }
         isChoosing = false;
         Time.timeScale = 1f;
+    }
+
+    void ApplyStatChoice(int index) {
+        if (playerHealth == null) {
+            return;
+        }
+        switch (index) {
+            case 0: {
+                playerHealth.AddMaxHealth(10);
+                break;
+            }
+            case 1: {
+                playerHealth.AddAttackPower(1);
+                break;
+            }
+            case 2: {
+                playerHealth.AddDefense(1);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
     }
 }

@@ -28,6 +28,23 @@ public class PlayerHealth : MonoBehaviour {
         return attackPower;
     }
 
+    public void AddMaxHealth(int amount) {
+        maxHealth += amount;
+        currentHealth += amount;
+        if (healthBar != null) {
+            float ratio = (float)currentHealth / maxHealth;
+            healthBar.SetRatio(ratio);
+        }
+    }
+
+    public void AddAttackPower(int amount) {
+        attackPower += amount;
+    }
+
+    public void AddDefense(int amount) {
+        defense += amount;
+    }
+
     public void ApplyHit(int incomingAttack) {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;

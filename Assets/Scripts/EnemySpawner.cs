@@ -66,6 +66,8 @@ public class EnemySpawner : MonoBehaviour {
             enemy.ApplyDefinition(definition);
             enemy.SetTarget(playerTransform);
             enemy.SetSpawner(this);
+            int spawnLevel = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
+            enemy.SetLevel(spawnLevel);
         }
         aliveEnemyCount++;
     }

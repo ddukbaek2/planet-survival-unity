@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
     private int level;
     private int experience;
     private int pendingLevelUps;
+    private int money;
     private bool isGameOver;
 
     void Awake() {
@@ -18,6 +19,7 @@ public class GameManager : MonoBehaviour {
         level = 1;
         experience = 0;
         pendingLevelUps = 0;
+        money = 0;
         isGameOver = false;
         Time.timeScale = 1f;
     }
@@ -58,6 +60,17 @@ public class GameManager : MonoBehaviour {
             level += 1;
             pendingLevelUps += 1;
         }
+    }
+
+    public int GetMoney() {
+        return money;
+    }
+
+    public void AddMoney(int amount) {
+        if (isGameOver) {
+            return;
+        }
+        money += amount;
     }
 
     public void GameOver() {

@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour {
     private int attackPower = 1;
     private int defense;
     private float moveSpeed = 2.5f;
+    private int level = 1;
 
     private Transform targetTransform;
     private HealthBar healthBar;
@@ -42,6 +43,10 @@ public class Enemy : MonoBehaviour {
         spawner = value;
     }
 
+    public void SetLevel(int value) {
+        level = value;
+    }
+
     void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
@@ -73,6 +78,7 @@ public class Enemy : MonoBehaviour {
     void Die() {
         if (GameManager.Instance != null) {
             GameManager.Instance.AddKill();
+            GameManager.Instance.AddMoney(1 * level);
         }
         Object.Destroy(gameObject);
     }

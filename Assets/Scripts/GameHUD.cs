@@ -7,6 +7,7 @@ public class GameHUD : MonoBehaviour {
     [SerializeField] private RectTransform experienceFill;
     [SerializeField] private TMP_Text levelLabel;
     [SerializeField] private TMP_Text healthLabel;
+    [SerializeField] private TMP_Text moneyLabel;
     [SerializeField] private TMP_Text fpsText;
     [SerializeField] private TMP_Text statsText;
     [SerializeField] private PlayerHealth playerHealth;
@@ -60,6 +61,9 @@ public class GameHUD : MonoBehaviour {
         SetFill(experienceFill, experienceRatio);
         if (levelLabel != null) {
             levelLabel.text = "Lv. " + level + "   " + experience + " / " + requiredExperience;
+        }
+        if (moneyLabel != null) {
+            moneyLabel.text = "돈 " + gameManager.GetMoney();
         }
 
         bool isGameOver = gameManager.IsGameOver();
