@@ -79,11 +79,13 @@
     window.addEventListener("orientationchange", setViewportHeight);
 
     var buildUrl = "Build";
-    var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}";
+    // 빌드 버전을 쿼리로 붙여 브라우저가 이전 빌드의 wasm/data 를 캐시하지 못하게 한다.
+    var cacheBust = "?v={{{ PRODUCT_VERSION }}}";
+    var loaderUrl = buildUrl + "/{{{ LOADER_FILENAME }}}" + cacheBust;
     var config = {
-      dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}",
-      frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}",
-      codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}",
+      dataUrl: buildUrl + "/{{{ DATA_FILENAME }}}" + cacheBust,
+      frameworkUrl: buildUrl + "/{{{ FRAMEWORK_FILENAME }}}" + cacheBust,
+      codeUrl: buildUrl + "/{{{ CODE_FILENAME }}}" + cacheBust,
       streamingAssetsUrl: "StreamingAssets",
       companyName: "{{{ COMPANY_NAME }}}",
       productName: "{{{ PRODUCT_NAME }}}",
