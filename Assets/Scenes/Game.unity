@@ -2757,9 +2757,9 @@ MonoBehaviour:
   spawnRadius: 15
   initialSpawnInterval: 1.2
   minimumSpawnInterval: 0.35
-  initialSpawnCount: 1
-  maximumSpawnCount: 5
-  maximumAliveEnemies: 200
+  initialSpawnCount: 3
+  maximumSpawnCount: 15
+  maximumAliveEnemies: 600
   difficultyRampSeconds: 60
 --- !u!4 &1403699802
 Transform:

@@ -14,6 +14,7 @@ public class EnemySpawner : MonoBehaviour {
     private float spawnTimer;
     private float elapsedTime;
     private int aliveEnemyCount;
+    private bool bossSpawned;
 
     void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
@@ -21,6 +22,10 @@ public class EnemySpawner : MonoBehaviour {
         }
         if (enemyPrefab == null || playerTransform == null) {
             return;
+        }
+        if (!bossSpawned && GameManager.Instance != null && GameManager.Instance.GetLevel() >= 50) {
+            bossSpawned = true;
+            SpawnBoss();
         }
         elapsedTime += Time.deltaTime;
         spawnTimer -= Time.deltaTime;
@@ -63,6 +68,25 @@ public class EnemySpawner : MonoBehaviour {
         Enemy enemy = enemyObject.GetComponent<Enemy>();
         if (enemy != null) {
             EnemyDefinition definition = EnemyTable.PickForTime(elapsedTime);
+            enemy.ApplyDefinition(definition);
+            enemy.SetTarget(playerTransform);
+            enemy.SetSpawner(this);
+            int spawnLevel = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
+            enemy.SetLevel(spawnLevel);
+        }
+        aliveEnemyCount++;
+    }
+
+    void SpawnBoss() {
+        float randomAngle = Random.Range(0f, Mathf.PI * 2f);
+        Vector3 playerPosition = playerTransform.position;
+        Vector3 spawnOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * spawnRadius;
+        Vector3 spawnPosition = playerPosition + spawnOffset;
+        spawnPosition.y = playerPosition.y;
+        GameObject enemyObject = Object.Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        Enemy enemy = enemyObject.GetComponent<Enemy>();
+        if (enemy != null) {
+            EnemyDefinition definition = EnemyTable.GetBoss();
             enemy.ApplyDefinition(definition);
             enemy.SetTarget(playerTransform);
             enemy.SetSpawner(this);

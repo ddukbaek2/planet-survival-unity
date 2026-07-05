@@ -41,9 +41,9 @@ public static class WeaponDatabase {
         new WeaponDefinition(WeaponType.SpreadShot, "산탄", "산", new Color(1f, 0.85f, 0.35f), 0.8f, 0.8f),
         new WeaponDefinition(WeaponType.NovaBurst, "전방위탄", "전", new Color(0.72f, 0.62f, 1f), 1.2f, 0.8f),
         new WeaponDefinition(WeaponType.Boomerang, "부메랑", "부", new Color(0.45f, 1f, 0.72f), 1.0f, 1f),
-        new WeaponDefinition(WeaponType.OrbitOrb, "궤도구체", "궤", new Color(0.6f, 0.82f, 1f), 3.0f, 0.8f),
-        new WeaponDefinition(WeaponType.SweepSlash, "휩쓸기", "휩", new Color(1f, 0.62f, 0.9f), 1.5f, 1f),
-        new WeaponDefinition(WeaponType.Mine, "지뢰", "지", new Color(1f, 0.72f, 0.25f), 1.5f, 1.2f),
+        new WeaponDefinition(WeaponType.OrbitOrb, "궤도구체", "궤", new Color(0.6f, 0.82f, 1f), 3.0f, 0.5f),
+        new WeaponDefinition(WeaponType.SweepSlash, "휩쓸기", "휩", new Color(1f, 0.62f, 0.9f), 5.0f, 0.3f),
+        new WeaponDefinition(WeaponType.Mine, "지뢰", "지", new Color(1f, 0.72f, 0.25f), 5.0f, 1.2f),
         new WeaponDefinition(WeaponType.ExplosiveShot, "폭발탄", "폭", new Color(1f, 0.42f, 0.32f), 1.1f, 1.5f)
     };
 

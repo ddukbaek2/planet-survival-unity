@@ -3,7 +3,7 @@ using UnityEngine;
 public class DeathSplat : MonoBehaviour {
     [SerializeField] private string resourcePath = "Sprites/splat_green_sheet";
     [SerializeField] private float frameDuration = 0.045f;
-    [SerializeField] private float lingerTime = 0.5f;
+    [SerializeField] private float lingerTime = 2.5f;
 
     private SpriteRenderer spriteRenderer;
     private readonly Sprite[] frames = new Sprite[8];

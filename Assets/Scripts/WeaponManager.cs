@@ -24,7 +24,9 @@ public class WeaponManager : MonoBehaviour {
             cooldownTimers[weaponType] = 0f;
             ownedWeapons.Add(weaponType);
         }
-        weaponLevels[weaponType] = weaponLevels[weaponType] + 1;
+        if (weaponLevels[weaponType] < 10) {
+            weaponLevels[weaponType] = weaponLevels[weaponType] + 1;
+        }
     }
 
     public bool HasWeapon(WeaponType weaponType) {
@@ -62,7 +64,15 @@ public class WeaponManager : MonoBehaviour {
     float GetCooldown(WeaponType weaponType) {
         float baseCooldown = WeaponDatabase.GetCooldown(weaponType);
         int weaponLevel = GetWeaponLevel(weaponType);
-        float scaledCooldown = baseCooldown * Mathf.Pow(0.9f, Mathf.Max(0, weaponLevel - 1));
+        int levelSteps = Mathf.Max(0, weaponLevel - 1);
+        float perLevelFactor = 0.9f;
+        if (weaponType == WeaponType.Mine) {
+            perLevelFactor = 0.8f;
+        }
+        else if (weaponType == WeaponType.StraightShot) {
+            perLevelFactor = 0.85f;
+        }
+        float scaledCooldown = baseCooldown * Mathf.Pow(perLevelFactor, levelSteps);
         return Mathf.Max(0.1f, scaledCooldown);
     }
 
@@ -117,7 +127,7 @@ public class WeaponManager : MonoBehaviour {
                 break;
             }
             case WeaponType.OrbitOrb: {
-                int orbCount = 1 + weaponLevel;
+                int orbCount = weaponLevel;
                 for (int index = 0; index < orbCount; index++) {
                     float startAngle = 360f * index / orbCount;
                     SpawnOrbit(startAngle, attackPower);
@@ -129,7 +139,7 @@ public class WeaponManager : MonoBehaviour {
                 break;
             }
             case WeaponType.Mine: {
-                SpawnMine(attackPower);
+                SpawnMine(weaponLevel, attackPower);
                 break;
             }
             case WeaponType.ExplosiveShot: {
@@ -205,7 +215,7 @@ public class WeaponManager : MonoBehaviour {
         GameObject orbitObject = Object.Instantiate(orbitPrefab, transform.position, Quaternion.identity);
         OrbitProjectile orbit = orbitObject.GetComponent<OrbitProjectile>();
         if (orbit != null) {
-            orbit.Configure(transform, 2.6f, 200f, attackPower, 4f, startAngle);
+            orbit.Configure(transform, 2.6f, 100f, attackPower, 4f, startAngle);
         }
     }
 
@@ -223,7 +233,7 @@ public class WeaponManager : MonoBehaviour {
         }
     }
 
-    void SpawnMine(int attackPower) {
+    void SpawnMine(int weaponLevel, int attackPower) {
         if (minePrefab == null) {
             return;
         }
@@ -232,7 +242,8 @@ public class WeaponManager : MonoBehaviour {
         GameObject mineObject = Object.Instantiate(minePrefab, spawnPosition, Quaternion.Euler(90f, 0f, 0f));
         MineField mine = mineObject.GetComponent<MineField>();
         if (mine != null) {
-            mine.Configure(attackPower, 2.6f, 4f, 0.5f);
+            float mineRadius = 1.3f * Mathf.Pow(1.2f, Mathf.Max(0, weaponLevel - 1));
+            mine.Configure(attackPower, mineRadius, 4f, 0.5f);
         }
     }
 }
