@@ -27,7 +27,11 @@ public static class EnemyTable {
         new EnemyDefinition("방패병", 6, 2, 1, 1.8f, 0.72f, "Sprites/roach_sheet"),
         new EnemyDefinition("정예병", 10, 2, 2, 2.2f, 0.9f, "Sprites/roach_sheet"),
         new EnemyDefinition("모기", 3, 1, 0, 5.0f, 0.5f, "Sprites/mosquito_sheet"),
-        new EnemyDefinition("지네", 8, 2, 1, 2.0f, 0.85f, "Sprites/centipede_sheet")
+        new EnemyDefinition("지네", 8, 2, 1, 2.0f, 0.85f, "Sprites/centipede_sheet"),
+        new EnemyDefinition("맨티스", 6, 3, 1, 3.0f, 0.75f, "Sprites/mantis_sheet"),
+        new EnemyDefinition("스파이더", 5, 2, 0, 3.8f, 0.7f, "Sprites/spider_sheet"),
+        new EnemyDefinition("와스프", 4, 2, 0, 4.5f, 0.6f, "Sprites/wasp_sheet"),
+        new EnemyDefinition("스콜피온", 14, 3, 3, 1.8f, 0.95f, "Sprites/scorpion_sheet")
     };
 
     public static int Count {
