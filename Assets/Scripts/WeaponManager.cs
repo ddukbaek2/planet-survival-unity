@@ -194,7 +194,7 @@ public class WeaponManager : MonoBehaviour {
             projectile = projectileObject.GetComponent<Projectile>();
         }
         if (projectile != null) {
-            projectile.Configure(direction, attackPower, 18f, 3f, projectileMode, pierce, explosion);
+            projectile.Configure(direction, attackPower, 9f, 3f, projectileMode, pierce, explosion);
         }
     }
 

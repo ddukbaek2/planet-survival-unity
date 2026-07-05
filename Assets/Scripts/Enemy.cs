@@ -12,11 +12,13 @@ public class Enemy : MonoBehaviour {
 
     private Transform targetTransform;
     private HealthBar healthBar;
+    private EnemySprite enemySprite;
     private EnemySpawner spawner;
 
     void Awake() {
         currentHealth = maxHealth;
         healthBar = GetComponentInChildren<HealthBar>();
+        enemySprite = GetComponentInChildren<EnemySprite>();
         if (healthBar != null) {
             healthBar.SetRatio(1f);
         }
@@ -30,6 +32,9 @@ public class Enemy : MonoBehaviour {
         defense = definition.defense;
         moveSpeed = definition.moveSpeed;
         transform.localScale = new Vector3(definition.scale, definition.scale, definition.scale);
+        if (enemySprite != null) {
+            enemySprite.SetSheet(definition.spriteResourcePath);
+        }
         if (healthBar != null) {
             healthBar.SetRatio(1f);
         }

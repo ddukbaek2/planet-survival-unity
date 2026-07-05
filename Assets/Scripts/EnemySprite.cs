@@ -24,6 +24,17 @@ public class EnemySprite : MonoBehaviour {
         }
     }
 
+    public void SetSheet(string newResourcePath) {
+        if (newResourcePath == resourcePath) {
+            return;
+        }
+        resourcePath = newResourcePath;
+        for (int index = 0; index < frames.Length; index++) {
+            frames[index] = null;
+        }
+        LoadFrames();
+    }
+
     void LoadFrames() {
         Sprite[] loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
         for (int index = 0; index < loadedSprites.Length; index++) {

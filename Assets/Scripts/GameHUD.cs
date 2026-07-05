@@ -37,7 +37,7 @@ public class GameHUD : MonoBehaviour {
             int activeEnemies = Enemy.ActiveCount;
             int activeProjectiles = ProjectilePool.Instance != null ? ProjectilePool.Instance.GetActiveCount() : 0;
             int totalProjectiles = ProjectilePool.Instance != null ? ProjectilePool.Instance.GetTotalCount() : 0;
-            statsText.text = "적 " + activeEnemies + "\n발사체 " + activeProjectiles + "\n풀 " + activeProjectiles + " / " + totalProjectiles;
+            statsText.text = "적 " + activeEnemies + "\n발사체 " + activeProjectiles + " / " + totalProjectiles;
         }
 
         if (playerHealth != null) {
@@ -69,9 +69,6 @@ public class GameHUD : MonoBehaviour {
         bool isGameOver = gameManager.IsGameOver();
         if (gameOverPanel != null && gameOverPanel.activeSelf != isGameOver) {
             gameOverPanel.SetActive(isGameOver);
-        }
-        if (isGameOver && resultText != null) {
-            resultText.text = "도달 레벨: " + level;
         }
     }
 
