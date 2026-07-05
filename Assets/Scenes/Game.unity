@@ -241,8 +241,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSprite
   spriteRenderer: {fileID: 163226505}
   resourcePath: Sprites/marine_blue_sheet_1
-  framesPerSecond: 10
-  moveThreshold: 0.015
+  baseFrameIndex: 16
 --- !u!212 &163226505
 SpriteRenderer:
   serializedVersion: 2
@@ -619,6 +618,19 @@ MonoBehaviour:
   target: {fileID: 1902234896}
   height: 20
   followSmoothTime: 0.12
+--- !u!134 &408406705
+PhysicsMaterial:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: 
+  serializedVersion: 2
+  m_DynamicFriction: 0.6
+  m_StaticFriction: 0.6
+  m_Bounciness: 0
+  m_FrictionCombine: 0
+  m_BounceCombine: 0
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -4187,7 +4199,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b361fa0dafdf53a45ae8afe97ecd6bd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 8
+  moveSpeed: 7
   dragDeadzonePixels: 12
   joystickBase: {fileID: 2108319874}
   joystickKnob: {fileID: 2002356799}
@@ -4271,7 +4283,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1902234895}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 408406705}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
