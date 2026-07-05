@@ -85,7 +85,20 @@ public class Enemy : MonoBehaviour {
             GameManager.Instance.AddKill();
             GameManager.Instance.AddMoney(1 * level);
         }
+        SpawnDeathSplat();
         Object.Destroy(gameObject);
+    }
+
+    void SpawnDeathSplat() {
+        GameObject splatObject = new GameObject("DeathSplat");
+        Vector3 splatPosition = transform.position;
+        splatPosition.y = 0.06f;
+        splatObject.transform.position = splatPosition;
+        splatObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        float enemyScale = transform.localScale.x;
+        splatObject.transform.localScale = new Vector3(enemyScale, enemyScale, enemyScale);
+        splatObject.AddComponent<SpriteRenderer>();
+        splatObject.AddComponent<DeathSplat>();
     }
 
     void OnTriggerEnter(Collider other) {

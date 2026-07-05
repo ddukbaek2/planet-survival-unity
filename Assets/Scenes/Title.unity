@@ -417,7 +417,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleController
   versionText: {fileID: 290303}
-  gameSceneName: Game
+  gameSceneName: CharacterSelect
 --- !u!114 &504151880
 MonoBehaviour:
   m_ObjectHideFlags: 0
