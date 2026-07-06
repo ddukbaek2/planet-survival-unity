@@ -23,6 +23,13 @@ public class BossBar : MonoBehaviour {
         }
     }
 
+    public Transform GetCurrentBossTransform() {
+        if (currentBoss == null) {
+            return null;
+        }
+        return currentBoss.transform;
+    }
+
     public void Show(Enemy boss, string bossName) {
         currentBoss = boss;
         if (nameLabel != null) {
