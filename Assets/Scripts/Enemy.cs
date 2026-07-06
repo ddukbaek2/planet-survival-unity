@@ -19,6 +19,9 @@ public class Enemy : MonoBehaviour {
     private PlayerHealth contactPlayerHealth;
     private float attackCooldown;
     private float attackInterval = 1f;
+    private Vector3 cachedSeparation;
+    private int separationPhase;
+    private static readonly Collider[] separationBuffer = new Collider[12];
 
     private Transform targetTransform;
     private HealthBar healthBar;
@@ -32,6 +35,7 @@ public class Enemy : MonoBehaviour {
         if (healthBar != null) {
             healthBar.SetRatio(1f);
         }
+        separationPhase = Mathf.Abs(GetInstanceID()) % 3;
         ActiveCount += 1;
     }
 
@@ -82,11 +86,41 @@ public class Enemy : MonoBehaviour {
         Vector3 moveDirection = targetPosition - currentPosition;
         moveDirection.y = 0f;
         moveDirection = moveDirection.normalized;
+        if (!isBoss && (Time.frameCount + separationPhase) % 3 == 0) {
+            cachedSeparation = ComputeSeparation();
+        }
+        Vector3 desiredDirection = moveDirection + cachedSeparation;
+        if (desiredDirection.sqrMagnitude > 0.0001f) {
+            desiredDirection = desiredDirection.normalized;
+        }
+        else {
+            desiredDirection = moveDirection;
+        }
         float currentSpeed = moveSpeed;
         if (isBoss) {
             currentSpeed = UpdateBossPattern();
         }
-        transform.position = currentPosition + moveDirection * currentSpeed * Time.deltaTime;
+        transform.position = currentPosition + desiredDirection * currentSpeed * Time.deltaTime;
+    }
+
+    Vector3 ComputeSeparation() {
+        float personalSpace = 0.8f * transform.localScale.x;
+        Vector3 selfPosition = transform.position;
+        int count = Physics.OverlapSphereNonAlloc(selfPosition, personalSpace, separationBuffer);
+        Vector3 push = Vector3.zero;
+        for (int index = 0; index < count; index++) {
+            Enemy other = separationBuffer[index].GetComponentInParent<Enemy>();
+            if (other == null || other == this) {
+                continue;
+            }
+            Vector3 away = selfPosition - other.transform.position;
+            away.y = 0f;
+            float distance = away.magnitude;
+            if (distance > 0.001f && distance < personalSpace) {
+                push += away.normalized * ((personalSpace - distance) / personalSpace);
+            }
+        }
+        return push;
     }
 
     float UpdateBossPattern() {
