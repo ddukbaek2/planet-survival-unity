@@ -18,6 +18,7 @@ public class Enemy : MonoBehaviour {
     private float dashRemaining;
     private bool dashing;
     private float shockTimer;
+    private float missileTimer;
     private bool touchingPlayer;
     private PlayerHealth contactPlayerHealth;
     private float attackCooldown;
@@ -60,10 +61,16 @@ public class Enemy : MonoBehaviour {
         spawnsWeb = definition.spawnsWeb;
         webTimer = 4f;
         bossName = definition.displayName;
-        if (isBoss && BossBar.Instance != null) {
+        if (isBoss) {
+            if (healthBar != null) {
+                healthBar.gameObject.SetActive(false);
+            }
             dashTimer = 4f;
             shockTimer = 5f;
-            BossBar.Instance.Show(this, bossName);
+            missileTimer = 3f;
+            if (BossBar.Instance != null) {
+                BossBar.Instance.Show(this, bossName);
+            }
         }
     }
 
@@ -155,7 +162,43 @@ public class Enemy : MonoBehaviour {
             shockTimer = 5f;
             EmitShockwave();
         }
+        missileTimer -= deltaTime;
+        if (missileTimer <= 0f) {
+            missileTimer = 3f;
+            FireBossMissiles();
+        }
         return speed;
+    }
+
+    void FireBossMissiles() {
+        if (targetTransform == null) {
+            return;
+        }
+        for (int index = 0; index < 3; index++) {
+            GameObject missile = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            missile.name = "BossMissile";
+            Vector3 missilePosition = transform.position;
+            missilePosition.y = 0.4f;
+            float angle = (index - 1) * 25f;
+            Vector3 offset = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * 0.8f;
+            missile.transform.position = missilePosition + offset;
+            missile.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
+            Renderer missileRenderer = missile.GetComponent<Renderer>();
+            if (missileRenderer != null) {
+                missileRenderer.material.SetColor("_BaseColor", new Color(0.6f, 0.1f, 0.7f));
+                missileRenderer.material.EnableKeyword("_EMISSION");
+                missileRenderer.material.SetColor("_EmissionColor", new Color(0.6f, 0.1f, 0.8f));
+            }
+            SphereCollider missileCollider = missile.GetComponent<SphereCollider>();
+            if (missileCollider != null) {
+                missileCollider.isTrigger = true;
+            }
+            Rigidbody missileBody = missile.AddComponent<Rigidbody>();
+            missileBody.isKinematic = true;
+            missileBody.useGravity = false;
+            BossMissile bossMissile = missile.AddComponent<BossMissile>();
+            bossMissile.Configure(targetTransform, attackPower);
+        }
     }
 
     void EmitShockwave() {

@@ -44,5 +44,10 @@ public class HealthBar : MonoBehaviour {
         }
         transform.position = anchorTransform.position + Vector3.Scale(worldOffset, anchorTransform.lossyScale);
         transform.rotation = flatRotation;
+        float parentScale = anchorTransform.lossyScale.x;
+        if (parentScale > 0.0001f) {
+            float inverseScale = 1f / parentScale;
+            transform.localScale = new Vector3(inverseScale, inverseScale, inverseScale);
+        }
     }
 }

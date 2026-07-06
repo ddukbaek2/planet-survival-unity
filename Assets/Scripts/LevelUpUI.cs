@@ -12,6 +12,7 @@ public class LevelUpUI : MonoBehaviour {
     [SerializeField] private Image[] choiceIcons;
     [SerializeField] private TMP_Text[] choiceIconChars;
     [SerializeField] private TMP_Text[] choiceLabels;
+    [SerializeField] private Button randomAllButton;
 
     private readonly WeaponType[] currentChoices = new WeaponType[3];
     private bool isChoosing;
@@ -31,6 +32,9 @@ public class LevelUpUI : MonoBehaviour {
             choiceButtons[index].onClick.AddListener(delegate {
                 OnChoiceClicked(capturedIndex);
             });
+        }
+        if (randomAllButton != null) {
+            randomAllButton.onClick.AddListener(OnRandomAllClicked);
         }
         if (panel != null) {
             panel.SetActive(false);
@@ -124,6 +128,21 @@ public class LevelUpUI : MonoBehaviour {
         if (GameManager.Instance != null && GameManager.Instance.HasPendingLevelUp()) {
             ShowStatStage();
             return;
+        }
+        if (panel != null) {
+            panel.SetActive(false);
+        }
+        isChoosing = false;
+        Time.timeScale = 1f;
+    }
+
+    void OnRandomAllClicked() {
+        while (GameManager.Instance != null && GameManager.Instance.HasPendingLevelUp()) {
+            ApplyStatChoice(Random.Range(0, 3));
+            if (weaponManager != null) {
+                weaponManager.AddWeapon((WeaponType)Random.Range(0, WeaponDatabase.WeaponCount));
+            }
+            GameManager.Instance.ConsumeLevelUp();
         }
         if (panel != null) {
             panel.SetActive(false);
