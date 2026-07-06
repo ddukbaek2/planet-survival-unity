@@ -10,6 +10,7 @@ public struct EnemyDefinition {
     public string spriteResourcePath;
     public bool isBoss;
     public bool isElite;
+    public bool spawnsWeb;
 
     public EnemyDefinition(string displayName, int health, int attack, int defense, float moveSpeed, float scale, string spriteResourcePath) {
         this.displayName = displayName;
@@ -21,6 +22,7 @@ public struct EnemyDefinition {
         this.spriteResourcePath = spriteResourcePath;
         this.isBoss = false;
         this.isElite = false;
+        this.spawnsWeb = false;
     }
 }
 
@@ -38,6 +40,10 @@ public static class EnemyTable {
         new EnemyDefinition("스콜피온", 42, 3, 3, 1.8f, 0.95f, "Sprites/scorpion_sheet")
     };
 
+    static EnemyTable() {
+        Definitions[7].spawnsWeb = true;
+    }
+
     public static EnemyDefinition GetBoss() {
         EnemyDefinition boss = new EnemyDefinition("해충 군주", 500, 6, 4, 1.6f, 2.8f, "Sprites/scorpion_sheet");
         boss.isBoss = true;
@@ -53,6 +59,9 @@ public static class EnemyTable {
         float scale = 1.1f + phase * 0.01f;
         EnemyDefinition elite = new EnemyDefinition("엘리트 " + phase, health, attack, defense, 2.4f, scale, sprites[index]);
         elite.isElite = true;
+        if (sprites[index] == "Sprites/spider_sheet") {
+            elite.spawnsWeb = true;
+        }
         return elite;
     }
 

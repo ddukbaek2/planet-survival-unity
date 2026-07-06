@@ -11,6 +11,8 @@ public class Enemy : MonoBehaviour {
     private int level = 1;
     private bool isBoss;
     private bool isElite;
+    private bool spawnsWeb;
+    private float webTimer;
     private string bossName;
     private float dashTimer;
     private float dashRemaining;
@@ -55,6 +57,8 @@ public class Enemy : MonoBehaviour {
         }
         isBoss = definition.isBoss;
         isElite = definition.isElite;
+        spawnsWeb = definition.spawnsWeb;
+        webTimer = 4f;
         bossName = definition.displayName;
         if (isBoss && BossBar.Instance != null) {
             dashTimer = 4f;
@@ -80,6 +84,9 @@ public class Enemy : MonoBehaviour {
             return;
         }
         HandleContactDamage();
+        if (spawnsWeb) {
+            HandleWeb();
+        }
         if (targetTransform == null) {
             return;
         }
@@ -230,6 +237,31 @@ public class Enemy : MonoBehaviour {
         splatObject.transform.localScale = new Vector3(splatScale, splatScale, splatScale);
         splatObject.AddComponent<SpriteRenderer>();
         splatObject.AddComponent<DeathSplat>();
+    }
+
+    void HandleWeb() {
+        webTimer -= Time.deltaTime;
+        if (webTimer <= 0f) {
+            webTimer = 4f;
+            SpawnWeb();
+        }
+    }
+
+    void SpawnWeb() {
+        GameObject web = new GameObject("WebZone");
+        Vector3 webPosition = transform.position;
+        webPosition.y = 0.05f;
+        web.transform.position = webPosition;
+        web.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+        web.transform.localScale = new Vector3(2.2f, 2.2f, 2.2f);
+        web.AddComponent<SpriteRenderer>();
+        SphereCollider webCollider = web.AddComponent<SphereCollider>();
+        webCollider.isTrigger = true;
+        webCollider.radius = 0.5f;
+        Rigidbody webBody = web.AddComponent<Rigidbody>();
+        webBody.isKinematic = true;
+        webBody.useGravity = false;
+        web.AddComponent<WebZone>();
     }
 
     void HandleContactDamage() {

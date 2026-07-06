@@ -10,6 +10,18 @@ public class PlayerController : MonoBehaviour {
 
     private bool isDragging;
     private Vector2 dragOrigin;
+    private int slowSourceCount;
+
+    public void AddSlow() {
+        slowSourceCount += 1;
+    }
+
+    public void RemoveSlow() {
+        slowSourceCount -= 1;
+        if (slowSourceCount < 0) {
+            slowSourceCount = 0;
+        }
+    }
 
     void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
@@ -42,7 +54,8 @@ public class PlayerController : MonoBehaviour {
         Vector2 dragDirection = dragVector.normalized;
         Vector3 moveDirection = new Vector3(dragDirection.x, 0f, dragDirection.y);
         transform.rotation = Quaternion.LookRotation(moveDirection);
-        Vector3 nextPosition = transform.position + moveDirection * moveSpeed * Time.deltaTime;
+        float effectiveSpeed = slowSourceCount > 0 ? moveSpeed * 0.5f : moveSpeed;
+        Vector3 nextPosition = transform.position + moveDirection * effectiveSpeed * Time.deltaTime;
         nextPosition.y = transform.position.y;
         transform.position = nextPosition;
     }
