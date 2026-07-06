@@ -8,6 +8,7 @@ public struct EnemyDefinition {
     public float moveSpeed;
     public float scale;
     public string spriteResourcePath;
+    public bool isBoss;
 
     public EnemyDefinition(string displayName, int health, int attack, int defense, float moveSpeed, float scale, string spriteResourcePath) {
         this.displayName = displayName;
@@ -17,6 +18,7 @@ public struct EnemyDefinition {
         this.moveSpeed = moveSpeed;
         this.scale = scale;
         this.spriteResourcePath = spriteResourcePath;
+        this.isBoss = false;
     }
 }
 
@@ -35,7 +37,18 @@ public static class EnemyTable {
     };
 
     public static EnemyDefinition GetBoss() {
-        return new EnemyDefinition("해충 군주", 500, 6, 4, 1.6f, 2.8f, "Sprites/scorpion_sheet");
+        EnemyDefinition boss = new EnemyDefinition("해충 군주", 500, 6, 4, 1.6f, 2.8f, "Sprites/scorpion_sheet");
+        boss.isBoss = true;
+        return boss;
+    }
+
+    public static EnemyDefinition GetMidBoss(int tier) {
+        string[] names = { "지네 여왕", "사마귀 장군", "독거미 마님", "말벌 여왕" };
+        string[] sprites = { "Sprites/centipede_sheet", "Sprites/mantis_sheet", "Sprites/spider_sheet", "Sprites/wasp_sheet" };
+        int index = Mathf.Clamp(tier - 1, 0, 3);
+        EnemyDefinition midBoss = new EnemyDefinition(names[index], 100 * tier, 3 + tier, tier, 2.2f, 1.4f + tier * 0.15f, sprites[index]);
+        midBoss.isBoss = true;
+        return midBoss;
     }
 
     public static int Count {

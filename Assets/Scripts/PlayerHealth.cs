@@ -54,7 +54,7 @@ public class PlayerHealth : MonoBehaviour {
         if (currentHealth < 0) {
             currentHealth = 0;
         }
-        CombatText.Show(transform.position, damage, new Color(1f, 0.4f, 0.4f));
+        CombatText.Show(transform.position + new Vector3(0f, 0f, 0.8f), damage, new Color(1f, 0.15f, 0.15f));
         if (healthBar != null) {
             float ratio = (float)currentHealth / maxHealth;
             healthBar.SetRatio(ratio);

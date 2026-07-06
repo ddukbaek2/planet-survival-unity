@@ -34,7 +34,6 @@ public class PlayerController : MonoBehaviour {
         Vector2 dragVector = pointerPosition - dragOrigin;
         if (dragVector.magnitude > joystickRadius) {
             dragVector = dragVector.normalized * joystickRadius;
-            dragOrigin = pointerPosition - dragVector;
         }
         UpdateJoystickVisual(dragVector);
         if (dragVector.magnitude < dragDeadzonePixels) {

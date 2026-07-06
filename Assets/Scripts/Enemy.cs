@@ -9,6 +9,16 @@ public class Enemy : MonoBehaviour {
     private int defense;
     private float moveSpeed = 2.5f;
     private int level = 1;
+    private bool isBoss;
+    private string bossName;
+    private float dashTimer;
+    private float dashRemaining;
+    private bool dashing;
+    private float shockTimer;
+    private bool touchingPlayer;
+    private PlayerHealth contactPlayerHealth;
+    private float attackCooldown;
+    private float attackInterval = 1f;
 
     private Transform targetTransform;
     private HealthBar healthBar;
@@ -38,6 +48,13 @@ public class Enemy : MonoBehaviour {
         if (healthBar != null) {
             healthBar.SetRatio(1f);
         }
+        isBoss = definition.isBoss;
+        bossName = definition.displayName;
+        if (isBoss && BossBar.Instance != null) {
+            dashTimer = 4f;
+            shockTimer = 5f;
+            BossBar.Instance.Show(this, bossName);
+        }
     }
 
     public void SetTarget(Transform target) {
@@ -56,6 +73,7 @@ public class Enemy : MonoBehaviour {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
         }
+        HandleContactDamage();
         if (targetTransform == null) {
             return;
         }
@@ -64,7 +82,51 @@ public class Enemy : MonoBehaviour {
         Vector3 moveDirection = targetPosition - currentPosition;
         moveDirection.y = 0f;
         moveDirection = moveDirection.normalized;
-        transform.position = currentPosition + moveDirection * moveSpeed * Time.deltaTime;
+        float currentSpeed = moveSpeed;
+        if (isBoss) {
+            currentSpeed = UpdateBossPattern();
+        }
+        transform.position = currentPosition + moveDirection * currentSpeed * Time.deltaTime;
+    }
+
+    float UpdateBossPattern() {
+        float deltaTime = Time.deltaTime;
+        float speed = moveSpeed;
+        if (dashing) {
+            dashRemaining -= deltaTime;
+            speed = moveSpeed * 2.6f;
+            if (dashRemaining <= 0f) {
+                dashing = false;
+            }
+        }
+        else {
+            dashTimer -= deltaTime;
+            if (dashTimer <= 0f) {
+                dashTimer = 4f;
+                dashing = true;
+                dashRemaining = 0.6f;
+            }
+        }
+        shockTimer -= deltaTime;
+        if (shockTimer <= 0f) {
+            shockTimer = 5f;
+            EmitShockwave();
+        }
+        return speed;
+    }
+
+    void EmitShockwave() {
+        float shockRadius = 3f * transform.localScale.x;
+        Collider[] hits = Physics.OverlapSphere(transform.position, shockRadius);
+        for (int index = 0; index < hits.Length; index++) {
+            if (!hits[index].CompareTag("Player")) {
+                continue;
+            }
+            PlayerHealth playerHealth = hits[index].GetComponent<PlayerHealth>();
+            if (playerHealth != null) {
+                playerHealth.ApplyHit(attackPower);
+            }
+        }
     }
 
     public void ApplyHit(int incomingAttack) {
@@ -75,6 +137,9 @@ public class Enemy : MonoBehaviour {
             float ratio = (float)currentHealth / maxHealth;
             healthBar.SetRatio(ratio);
         }
+        if (isBoss && BossBar.Instance != null) {
+            BossBar.Instance.SetRatio(this, (float)currentHealth / maxHealth);
+        }
         if (currentHealth <= 0) {
             Die();
         }
@@ -84,6 +149,9 @@ public class Enemy : MonoBehaviour {
         if (GameManager.Instance != null) {
             GameManager.Instance.AddKill();
             GameManager.Instance.AddMoney(1 * level);
+        }
+        if (isBoss && BossBar.Instance != null) {
+            BossBar.Instance.Hide(this);
         }
         SpawnDeathSplat();
         Object.Destroy(gameObject);
@@ -101,15 +169,37 @@ public class Enemy : MonoBehaviour {
         splatObject.AddComponent<DeathSplat>();
     }
 
+    void HandleContactDamage() {
+        if (!touchingPlayer || contactPlayerHealth == null) {
+            return;
+        }
+        attackCooldown -= Time.deltaTime;
+        if (attackCooldown <= 0f) {
+            attackCooldown = attackInterval;
+            contactPlayerHealth.ApplyHit(attackPower);
+        }
+    }
+
     void OnTriggerEnter(Collider other) {
         if (!other.CompareTag("Player")) {
             return;
         }
         PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-        if (playerHealth != null) {
-            playerHealth.ApplyHit(attackPower);
+        if (playerHealth == null) {
+            return;
         }
-        Object.Destroy(gameObject);
+        contactPlayerHealth = playerHealth;
+        touchingPlayer = true;
+        playerHealth.ApplyHit(attackPower);
+        attackCooldown = attackInterval;
+    }
+
+    void OnTriggerExit(Collider other) {
+        if (!other.CompareTag("Player")) {
+            return;
+        }
+        touchingPlayer = false;
+        contactPlayerHealth = null;
     }
 
     void OnDestroy() {
