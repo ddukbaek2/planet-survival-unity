@@ -22,6 +22,10 @@ public class GameManager : MonoBehaviour {
         money = 0;
         isGameOver = false;
         Time.timeScale = 1f;
+        if (GameSelection.BossTraining) {
+            level = 50;
+            pendingLevelUps = 50;
+        }
     }
 
     public bool IsGameOver() {
@@ -55,11 +59,18 @@ public class GameManager : MonoBehaviour {
             return;
         }
         experience += 1;
-        while (experience >= GetRequiredExperience()) {
+        while (level < 50 && experience >= GetRequiredExperience()) {
             experience -= GetRequiredExperience();
             level += 1;
             pendingLevelUps += 1;
         }
+    }
+
+    public void GrantLevelUpReward() {
+        if (isGameOver) {
+            return;
+        }
+        pendingLevelUps += 1;
     }
 
     public int GetMoney() {

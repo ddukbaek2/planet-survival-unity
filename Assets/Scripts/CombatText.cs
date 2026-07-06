@@ -23,8 +23,7 @@ public class CombatText : MonoBehaviour {
     }
 
     void Spawn(Vector3 worldPosition, string content, Color color) {
-        Vector3 spawnPosition = worldPosition + new Vector3(Random.Range(-0.3f, 0.3f), 0.3f, 0f);
-        GameObject textObject = Object.Instantiate(floatingTextPrefab, spawnPosition, Quaternion.Euler(90f, 0f, 0f));
+        GameObject textObject = Object.Instantiate(floatingTextPrefab, worldPosition, Quaternion.Euler(90f, 0f, 0f));
         FloatingText floatingText = textObject.GetComponent<FloatingText>();
         if (floatingText != null) {
             floatingText.Show(content, color);

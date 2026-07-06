@@ -14,7 +14,9 @@ public class EnemySpawner : MonoBehaviour {
     private float spawnTimer;
     private float elapsedTime;
     private int aliveEnemyCount;
-    private int lastBossLevel;
+    private int lastElitePhase;
+    private bool bossSpawned;
+    private bool bossTrainingStarted;
 
     void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
@@ -23,11 +25,21 @@ public class EnemySpawner : MonoBehaviour {
         if (enemyPrefab == null || playerTransform == null) {
             return;
         }
-        if (GameManager.Instance != null) {
-            int currentLevel = GameManager.Instance.GetLevel();
-            if (currentLevel >= 10 && currentLevel % 10 == 0 && currentLevel > lastBossLevel) {
-                lastBossLevel = currentLevel;
-                SpawnBoss(currentLevel);
+        if (GameSelection.BossTraining) {
+            UpdateBossTraining();
+            return;
+        }
+        int phase = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
+        if (phase > lastElitePhase) {
+            lastElitePhase = phase;
+            if (phase >= 50) {
+                if (!bossSpawned) {
+                    bossSpawned = true;
+                    SpawnSpecial(EnemyTable.GetBoss());
+                }
+            }
+            else {
+                SpawnSpecial(EnemyTable.GetElite(phase));
             }
         }
         elapsedTime += Time.deltaTime;
@@ -36,7 +48,17 @@ public class EnemySpawner : MonoBehaviour {
             return;
         }
         spawnTimer = GetCurrentSpawnInterval();
-        SpawnBurst();
+        SpawnBurst(phase);
+    }
+
+    void UpdateBossTraining() {
+        if (GameManager.Instance != null && GameManager.Instance.HasPendingLevelUp()) {
+            return;
+        }
+        if (!bossTrainingStarted) {
+            bossTrainingStarted = true;
+            SpawnSpecial(EnemyTable.GetBoss());
+        }
     }
 
     float GetCurrentSpawnInterval() {
@@ -51,10 +73,11 @@ public class EnemySpawner : MonoBehaviour {
         return Mathf.RoundToInt(currentCount);
     }
 
-    void SpawnBurst() {
-        int spawnCount = GetCurrentSpawnCount();
+    void SpawnBurst(int phase) {
+        int spawnCount = Mathf.Clamp(GetCurrentSpawnCount() + phase / 3, 1, 20);
+        int aliveCap = Mathf.Min(maximumAliveEnemies, 60 + phase * 12);
         for (int index = 0; index < spawnCount; index++) {
-            if (aliveEnemyCount >= maximumAliveEnemies) {
+            if (aliveEnemyCount >= aliveCap) {
                 return;
             }
             SpawnEnemy();
@@ -80,7 +103,7 @@ public class EnemySpawner : MonoBehaviour {
         aliveEnemyCount++;
     }
 
-    void SpawnBoss(int level) {
+    void SpawnSpecial(EnemyDefinition definition) {
         float randomAngle = Random.Range(0f, Mathf.PI * 2f);
         Vector3 playerPosition = playerTransform.position;
         Vector3 spawnOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * spawnRadius;
@@ -89,7 +112,6 @@ public class EnemySpawner : MonoBehaviour {
         GameObject enemyObject = Object.Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
         Enemy enemy = enemyObject.GetComponent<Enemy>();
         if (enemy != null) {
-            EnemyDefinition definition = level >= 50 ? EnemyTable.GetBoss() : EnemyTable.GetMidBoss(level / 10);
             enemy.ApplyDefinition(definition);
             enemy.SetTarget(playerTransform);
             enemy.SetSpawner(this);

@@ -9,6 +9,7 @@ public struct EnemyDefinition {
     public float scale;
     public string spriteResourcePath;
     public bool isBoss;
+    public bool isElite;
 
     public EnemyDefinition(string displayName, int health, int attack, int defense, float moveSpeed, float scale, string spriteResourcePath) {
         this.displayName = displayName;
@@ -19,6 +20,7 @@ public struct EnemyDefinition {
         this.scale = scale;
         this.spriteResourcePath = spriteResourcePath;
         this.isBoss = false;
+        this.isElite = false;
     }
 }
 
@@ -40,6 +42,18 @@ public static class EnemyTable {
         EnemyDefinition boss = new EnemyDefinition("해충 군주", 500, 6, 4, 1.6f, 2.8f, "Sprites/scorpion_sheet");
         boss.isBoss = true;
         return boss;
+    }
+
+    public static EnemyDefinition GetElite(int phase) {
+        string[] sprites = { "Sprites/mantis_sheet", "Sprites/spider_sheet", "Sprites/wasp_sheet", "Sprites/scorpion_sheet", "Sprites/centipede_sheet" };
+        int index = (phase - 1) % sprites.Length;
+        int health = 20 + phase * 8;
+        int attack = 2 + phase / 5;
+        int defense = phase / 10;
+        float scale = 1.1f + phase * 0.01f;
+        EnemyDefinition elite = new EnemyDefinition("엘리트 " + phase, health, attack, defense, 2.4f, scale, sprites[index]);
+        elite.isElite = true;
+        return elite;
     }
 
     public static EnemyDefinition GetMidBoss(int tier) {

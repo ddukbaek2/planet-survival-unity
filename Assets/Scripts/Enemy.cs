@@ -10,6 +10,7 @@ public class Enemy : MonoBehaviour {
     private float moveSpeed = 2.5f;
     private int level = 1;
     private bool isBoss;
+    private bool isElite;
     private string bossName;
     private float dashTimer;
     private float dashRemaining;
@@ -53,6 +54,7 @@ public class Enemy : MonoBehaviour {
             healthBar.SetRatio(1f);
         }
         isBoss = definition.isBoss;
+        isElite = definition.isElite;
         bossName = definition.displayName;
         if (isBoss && BossBar.Instance != null) {
             dashTimer = 4f;
@@ -187,8 +189,35 @@ public class Enemy : MonoBehaviour {
         if (isBoss && BossBar.Instance != null) {
             BossBar.Instance.Hide(this);
         }
+        if (isElite) {
+            SpawnRewardItem();
+        }
         SpawnDeathSplat();
         Object.Destroy(gameObject);
+    }
+
+    void SpawnRewardItem() {
+        GameObject reward = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        reward.name = "RewardItem";
+        Vector3 rewardPosition = transform.position;
+        rewardPosition.y = 0.5f;
+        reward.transform.position = rewardPosition;
+        reward.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
+        Renderer rewardRenderer = reward.GetComponent<Renderer>();
+        if (rewardRenderer != null) {
+            rewardRenderer.material.SetColor("_BaseColor", new Color(1f, 0.85f, 0.2f));
+            rewardRenderer.material.EnableKeyword("_EMISSION");
+            rewardRenderer.material.SetColor("_EmissionColor", new Color(1f, 0.7f, 0.1f));
+        }
+        SphereCollider rewardCollider = reward.GetComponent<SphereCollider>();
+        if (rewardCollider != null) {
+            rewardCollider.isTrigger = true;
+            rewardCollider.radius = 1.5f;
+        }
+        Rigidbody rewardBody = reward.AddComponent<Rigidbody>();
+        rewardBody.isKinematic = true;
+        rewardBody.useGravity = false;
+        reward.AddComponent<RewardItem>();
     }
 
     void SpawnDeathSplat() {
@@ -197,8 +226,8 @@ public class Enemy : MonoBehaviour {
         splatPosition.y = 0.06f;
         splatObject.transform.position = splatPosition;
         splatObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-        float enemyScale = transform.localScale.x;
-        splatObject.transform.localScale = new Vector3(enemyScale, enemyScale, enemyScale);
+        float splatScale = transform.localScale.x * 2f;
+        splatObject.transform.localScale = new Vector3(splatScale, splatScale, splatScale);
         splatObject.AddComponent<SpriteRenderer>();
         splatObject.AddComponent<DeathSplat>();
     }

@@ -10,6 +10,11 @@ public class FloatingText : MonoBehaviour {
 
     void Awake() {
         textMesh = GetComponent<TMPro.TextMeshPro>();
+        transform.localScale = transform.localScale * 0.5f;
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        if (meshRenderer != null) {
+            meshRenderer.sortingOrder = 30000;
+        }
     }
 
     public void Show(string content, Color color) {
@@ -19,6 +24,7 @@ public class FloatingText : MonoBehaviour {
         baseColor = color;
         elapsedTime = 0f;
         if (textMesh != null) {
+            textMesh.alignment = TMPro.TextAlignmentOptions.Center;
             textMesh.text = content;
             textMesh.color = color;
         }
