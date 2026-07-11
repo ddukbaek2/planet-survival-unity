@@ -45,7 +45,7 @@ public static class EnemyTable {
     }
 
     public static EnemyDefinition GetBoss() {
-        EnemyDefinition boss = new EnemyDefinition("해충 군주", 50000, 30, 10, 1.6f, 2.8f, "Sprites/scorpion_sheet");
+        EnemyDefinition boss = new EnemyDefinition("해충 군주", 500000, 300, 100, 1.6f, 2.8f, "Sprites/scorpion_sheet");
         boss.isBoss = true;
         return boss;
     }
