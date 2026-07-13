@@ -13,7 +13,7 @@ public class WebZone : MonoBehaviour {
     private bool playerInside;
     private PlayerController affectedPlayer;
 
-    void Awake() {
+    private void Awake() {
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null) {
             spriteRenderer.sortingOrder = -1;
@@ -21,11 +21,11 @@ public class WebZone : MonoBehaviour {
         LoadFrames();
     }
 
-    void LoadFrames() {
-        Sprite[] loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
-        for (int index = 0; index < loadedSprites.Length; index++) {
-            string spriteName = loadedSprites[index].name;
-            int underscoreIndex = spriteName.LastIndexOf('_');
+    private void LoadFrames() {
+        var loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
+        for (var index = 0; index < loadedSprites.Length; index++) {
+            var spriteName = loadedSprites[index].name;
+            var underscoreIndex = spriteName.LastIndexOf('_');
             if (underscoreIndex < 0) {
                 continue;
             }
@@ -39,11 +39,11 @@ public class WebZone : MonoBehaviour {
         }
     }
 
-    void Update() {
+    private void Update() {
         timer += Time.deltaTime;
         if (frameCount > 0 && spriteRenderer != null) {
-            float growStep = growDuration / frameCount;
-            int index = Mathf.Min(frameCount - 1, Mathf.FloorToInt(timer / Mathf.Max(0.0001f, growStep)));
+            var growStep = growDuration / frameCount;
+            var index = Mathf.Min(frameCount - 1, Mathf.FloorToInt(timer / Mathf.Max(0.0001f, growStep)));
             if (index != currentFrame && frames[index] != null) {
                 currentFrame = index;
                 spriteRenderer.sprite = frames[index];
@@ -54,11 +54,11 @@ public class WebZone : MonoBehaviour {
         }
     }
 
-    void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         if (!other.CompareTag("Player")) {
             return;
         }
-        PlayerController playerController = other.GetComponent<PlayerController>();
+        var playerController = other.GetComponent<PlayerController>();
         if (playerController != null) {
             playerInside = true;
             affectedPlayer = playerController;
@@ -66,14 +66,14 @@ public class WebZone : MonoBehaviour {
         }
     }
 
-    void OnTriggerExit(Collider other) {
+    private void OnTriggerExit(Collider other) {
         if (!other.CompareTag("Player")) {
             return;
         }
         Object.Destroy(gameObject);
     }
 
-    void OnDestroy() {
+    private void OnDestroy() {
         if (playerInside && affectedPlayer != null) {
             affectedPlayer.RemoveSlow();
             playerInside = false;

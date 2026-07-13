@@ -16,11 +16,11 @@ public class ProjectilePool : MonoBehaviour {
         }
     }
 
-    void Awake() {
+    private void Awake() {
         instance = this;
     }
 
-    void OnDestroy() {
+    private void OnDestroy() {
         if (instance == this) {
             instance = null;
         }
@@ -40,7 +40,7 @@ public class ProjectilePool : MonoBehaviour {
             projectile = inactiveProjectiles.Pop();
         }
         else {
-            GameObject projectileObject = Object.Instantiate(projectilePrefab);
+            var projectileObject = Object.Instantiate(projectilePrefab);
             projectile = projectileObject.GetComponent<Projectile>();
             projectile.SetPool(this);
             totalCount += 1;

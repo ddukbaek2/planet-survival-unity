@@ -10,24 +10,24 @@ public class PlayerSprite : MonoBehaviour {
 
     private static readonly Quaternion flatRotation = Quaternion.Euler(90f, 0f, 0f);
 
-    void Awake() {
+    private void Awake() {
         anchorTransform = transform.parent;
         LoadBaseSprite();
     }
 
-    void LoadBaseSprite() {
+    private void LoadBaseSprite() {
         if (spriteRenderer == null) {
             return;
         }
         spriteRenderer.flipX = false;
-        Sprite[] loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
-        for (int index = 0; index < loadedSprites.Length; index++) {
-            string spriteName = loadedSprites[index].name;
-            int underscoreIndex = spriteName.LastIndexOf('_');
+        var loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
+        for (var index = 0; index < loadedSprites.Length; index++) {
+            var spriteName = loadedSprites[index].name;
+            var underscoreIndex = spriteName.LastIndexOf('_');
             if (underscoreIndex < 0) {
                 continue;
             }
-            string numberText = spriteName.Substring(underscoreIndex + 1);
+            var numberText = spriteName.Substring(underscoreIndex + 1);
             int frameIndex;
             if (int.TryParse(numberText, out frameIndex) && frameIndex == baseFrameIndex) {
                 spriteRenderer.sprite = loadedSprites[index];
@@ -36,11 +36,11 @@ public class PlayerSprite : MonoBehaviour {
         }
     }
 
-    void LateUpdate() {
+    private void LateUpdate() {
         if (anchorTransform == null || spriteRenderer == null) {
             return;
         }
-        Vector3 facingDirection = anchorTransform.forward;
+        var facingDirection = anchorTransform.forward;
         facingDirection.y = 0f;
         if (facingDirection.sqrMagnitude > 0.0001f) {
             currentYaw = Mathf.Atan2(facingDirection.x, facingDirection.z) * Mathf.Rad2Deg;

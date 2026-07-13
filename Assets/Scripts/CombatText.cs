@@ -5,11 +5,11 @@ public class CombatText : MonoBehaviour {
 
     [SerializeField] private GameObject floatingTextPrefab;
 
-    void Awake() {
+    private void Awake() {
         instance = this;
     }
 
-    void OnDestroy() {
+    private void OnDestroy() {
         if (instance == this) {
             instance = null;
         }
@@ -22,9 +22,9 @@ public class CombatText : MonoBehaviour {
         instance.Spawn(worldPosition, amount.ToString(), color);
     }
 
-    void Spawn(Vector3 worldPosition, string content, Color color) {
-        GameObject textObject = Object.Instantiate(floatingTextPrefab, worldPosition, Quaternion.Euler(90f, 0f, 0f));
-        FloatingText floatingText = textObject.GetComponent<FloatingText>();
+    private void Spawn(Vector3 worldPosition, string content, Color color) {
+        var textObject = Object.Instantiate(floatingTextPrefab, worldPosition, Quaternion.Euler(90f, 0f, 0f));
+        var floatingText = textObject.GetComponent<FloatingText>();
         if (floatingText != null) {
             floatingText.Show(content, color);
         }

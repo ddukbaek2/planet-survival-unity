@@ -10,14 +10,14 @@ public class BossBar : MonoBehaviour {
 
     private Enemy currentBoss;
 
-    void Awake() {
+    private void Awake() {
         Instance = this;
         if (panel != null) {
             panel.SetActive(false);
         }
     }
 
-    void OnDestroy() {
+    private void OnDestroy() {
         if (Instance == this) {
             Instance = null;
         }
@@ -58,10 +58,10 @@ public class BossBar : MonoBehaviour {
         }
     }
 
-    void SetRatioInternal(float ratio) {
+    private void SetRatioInternal(float ratio) {
         if (fill != null) {
-            float clampedRatio = Mathf.Clamp01(ratio);
-            Vector3 fillScale = fill.localScale;
+            var clampedRatio = Mathf.Clamp01(ratio);
+            var fillScale = fill.localScale;
             fillScale.x = clampedRatio;
             fill.localScale = fillScale;
         }

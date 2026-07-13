@@ -12,7 +12,7 @@ public class EnemySprite : MonoBehaviour {
 
     private static readonly Quaternion flatRotation = Quaternion.Euler(90f, 0f, 0f);
 
-    void Awake() {
+    private void Awake() {
         anchorTransform = transform.parent;
         LoadBaseSprite();
         if (anchorTransform != null) {
@@ -20,19 +20,19 @@ public class EnemySprite : MonoBehaviour {
         }
     }
 
-    void LoadBaseSprite() {
+    private void LoadBaseSprite() {
         if (spriteRenderer == null) {
             return;
         }
         spriteRenderer.flipX = false;
-        Sprite[] loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
-        for (int index = 0; index < loadedSprites.Length; index++) {
-            string spriteName = loadedSprites[index].name;
-            int underscoreIndex = spriteName.LastIndexOf('_');
+        var loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
+        for (var index = 0; index < loadedSprites.Length; index++) {
+            var spriteName = loadedSprites[index].name;
+            var underscoreIndex = spriteName.LastIndexOf('_');
             if (underscoreIndex < 0) {
                 continue;
             }
-            string numberText = spriteName.Substring(underscoreIndex + 1);
+            var numberText = spriteName.Substring(underscoreIndex + 1);
             int frameIndex;
             if (int.TryParse(numberText, out frameIndex) && frameIndex == baseFrameIndex) {
                 spriteRenderer.sprite = loadedSprites[index];
@@ -49,12 +49,12 @@ public class EnemySprite : MonoBehaviour {
         LoadBaseSprite();
     }
 
-    void LateUpdate() {
+    private void LateUpdate() {
         if (anchorTransform == null || spriteRenderer == null) {
             return;
         }
-        Vector3 currentPosition = anchorTransform.position;
-        Vector3 moveDelta = currentPosition - lastPosition;
+        var currentPosition = anchorTransform.position;
+        var moveDelta = currentPosition - lastPosition;
         moveDelta.y = 0f;
         lastPosition = currentPosition;
         if (moveDelta.magnitude > moveThreshold) {

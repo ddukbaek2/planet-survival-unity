@@ -18,7 +18,7 @@ public class EnemySpawner : MonoBehaviour {
     private bool bossSpawned;
     private bool bossTrainingStarted;
 
-    void Update() {
+    private void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
         }
@@ -29,17 +29,21 @@ public class EnemySpawner : MonoBehaviour {
             UpdateBossTraining();
             return;
         }
-        int phase = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
+        var phase = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
         if (phase > lastElitePhase) {
             lastElitePhase = phase;
             if (phase >= 50) {
                 if (!bossSpawned) {
                     bossSpawned = true;
-                    SpawnSpecial(EnemyTable.GetBoss());
+                    var bossDefinition = EnemyTable.GetBoss();
+                    SpawnSpecial(bossDefinition);
+                    StageAnnouncer.Show("B O S S", bossDefinition.displayName, new Color(1f, 0.24f, 0.24f));
                 }
             }
             else {
-                SpawnSpecial(EnemyTable.GetElite(phase));
+                var eliteDefinition = EnemyTable.GetElite(phase);
+                SpawnSpecial(eliteDefinition);
+                StageAnnouncer.Show("STAGE " + phase, "네임드 몬스터 · " + eliteDefinition.displayName, new Color(1f, 0.64f, 0.18f));
             }
         }
         elapsedTime += Time.deltaTime;
@@ -51,32 +55,34 @@ public class EnemySpawner : MonoBehaviour {
         SpawnBurst(phase);
     }
 
-    void UpdateBossTraining() {
+    private void UpdateBossTraining() {
         if (GameManager.Instance != null && GameManager.Instance.HasPendingLevelUp()) {
             return;
         }
         if (!bossTrainingStarted) {
             bossTrainingStarted = true;
-            SpawnSpecial(EnemyTable.GetBoss());
+            var bossDefinition = EnemyTable.GetBoss();
+            SpawnSpecial(bossDefinition);
+            StageAnnouncer.Show("B O S S", bossDefinition.displayName, new Color(1f, 0.24f, 0.24f));
         }
     }
 
-    float GetCurrentSpawnInterval() {
-        float difficultyProgress = Mathf.Clamp01(elapsedTime / difficultyRampSeconds);
-        float currentInterval = Mathf.Lerp(initialSpawnInterval, minimumSpawnInterval, difficultyProgress);
+    private float GetCurrentSpawnInterval() {
+        var difficultyProgress = Mathf.Clamp01(elapsedTime / difficultyRampSeconds);
+        var currentInterval = Mathf.Lerp(initialSpawnInterval, minimumSpawnInterval, difficultyProgress);
         return currentInterval;
     }
 
-    int GetCurrentSpawnCount() {
-        float difficultyProgress = Mathf.Clamp01(elapsedTime / difficultyRampSeconds);
-        float currentCount = Mathf.Lerp(initialSpawnCount, maximumSpawnCount, difficultyProgress);
+    private int GetCurrentSpawnCount() {
+        var difficultyProgress = Mathf.Clamp01(elapsedTime / difficultyRampSeconds);
+        var currentCount = Mathf.Lerp(initialSpawnCount, maximumSpawnCount, difficultyProgress);
         return Mathf.RoundToInt(currentCount);
     }
 
-    void SpawnBurst(int phase) {
-        int spawnCount = Mathf.Clamp(GetCurrentSpawnCount() + phase / 3, 1, 20);
-        int aliveCap = Mathf.Min(maximumAliveEnemies, 60 + phase * 12);
-        for (int index = 0; index < spawnCount; index++) {
+    private void SpawnBurst(int phase) {
+        var spawnCount = Mathf.Clamp(GetCurrentSpawnCount() + phase / 3, 1, 20);
+        var aliveCap = Mathf.Min(maximumAliveEnemies, 60 + phase * 12);
+        for (var index = 0; index < spawnCount; index++) {
             if (aliveEnemyCount >= aliveCap) {
                 return;
             }
@@ -84,38 +90,38 @@ public class EnemySpawner : MonoBehaviour {
         }
     }
 
-    void SpawnEnemy() {
-        float randomAngle = Random.Range(0f, Mathf.PI * 2f);
-        Vector3 playerPosition = playerTransform.position;
-        Vector3 spawnOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * spawnRadius;
-        Vector3 spawnPosition = playerPosition + spawnOffset;
+    private void SpawnEnemy() {
+        var randomAngle = Random.Range(0f, Mathf.PI * 2f);
+        var playerPosition = playerTransform.position;
+        var spawnOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * spawnRadius;
+        var spawnPosition = playerPosition + spawnOffset;
         spawnPosition.y = playerPosition.y;
-        GameObject enemyObject = Object.Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
-        Enemy enemy = enemyObject.GetComponent<Enemy>();
+        var enemyObject = Object.Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        var enemy = enemyObject.GetComponent<Enemy>();
         if (enemy != null) {
-            EnemyDefinition definition = EnemyTable.PickForTime(elapsedTime);
+            var definition = EnemyTable.PickForTime(elapsedTime);
             enemy.ApplyDefinition(definition);
             enemy.SetTarget(playerTransform);
             enemy.SetSpawner(this);
-            int spawnLevel = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
+            var spawnLevel = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
             enemy.SetLevel(spawnLevel);
         }
         aliveEnemyCount++;
     }
 
-    void SpawnSpecial(EnemyDefinition definition) {
-        float randomAngle = Random.Range(0f, Mathf.PI * 2f);
-        Vector3 playerPosition = playerTransform.position;
-        Vector3 spawnOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * spawnRadius;
-        Vector3 spawnPosition = playerPosition + spawnOffset;
+    private void SpawnSpecial(EnemyDefinition definition) {
+        var randomAngle = Random.Range(0f, Mathf.PI * 2f);
+        var playerPosition = playerTransform.position;
+        var spawnOffset = new Vector3(Mathf.Cos(randomAngle), 0f, Mathf.Sin(randomAngle)) * spawnRadius;
+        var spawnPosition = playerPosition + spawnOffset;
         spawnPosition.y = playerPosition.y;
-        GameObject enemyObject = Object.Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
-        Enemy enemy = enemyObject.GetComponent<Enemy>();
+        var enemyObject = Object.Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
+        var enemy = enemyObject.GetComponent<Enemy>();
         if (enemy != null) {
             enemy.ApplyDefinition(definition);
             enemy.SetTarget(playerTransform);
             enemy.SetSpawner(this);
-            int spawnLevel = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
+            var spawnLevel = GameManager.Instance != null ? GameManager.Instance.GetLevel() : 1;
             enemy.SetLevel(spawnLevel);
         }
         aliveEnemyCount++;

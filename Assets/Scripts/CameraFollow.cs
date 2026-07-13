@@ -7,12 +7,12 @@ public class CameraFollow : MonoBehaviour {
 
     private Vector3 followVelocity;
 
-    void LateUpdate() {
+    private void LateUpdate() {
         if (target == null) {
             return;
         }
-        Vector3 targetPosition = target.position;
-        Vector3 desiredPosition = new Vector3(targetPosition.x, height, targetPosition.z);
+        var targetPosition = target.position;
+        var desiredPosition = new Vector3(targetPosition.x, height, targetPosition.z);
         transform.position = Vector3.SmoothDamp(transform.position, desiredPosition, ref followVelocity, followSmoothTime);
     }
 }

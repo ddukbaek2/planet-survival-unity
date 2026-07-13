@@ -10,7 +10,7 @@ public class GameManager : MonoBehaviour {
     private int money;
     private bool isGameOver;
 
-    void Awake() {
+    private void Awake() {
         if (Instance != null && Instance != this) {
             Destroy(gameObject);
             return;
@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour {
 
     public void Restart() {
         Time.timeScale = 1f;
-        int activeSceneIndex = SceneManager.GetActiveScene().buildIndex;
+        var activeSceneIndex = SceneManager.GetActiveScene().buildIndex;
         SceneManager.LoadScene(activeSceneIndex);
     }
 }

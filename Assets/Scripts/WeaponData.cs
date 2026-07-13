@@ -48,7 +48,7 @@ public static class WeaponDatabase {
     };
 
     public static WeaponDefinition Get(WeaponType weaponType) {
-        for (int index = 0; index < Definitions.Length; index++) {
+        for (var index = 0; index < Definitions.Length; index++) {
             if (Definitions[index].type == weaponType) {
                 return Definitions[index];
             }

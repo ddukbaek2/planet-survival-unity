@@ -45,19 +45,19 @@ public static class EnemyTable {
     }
 
     public static EnemyDefinition GetBoss() {
-        EnemyDefinition boss = new EnemyDefinition("해충 군주", 500000, 300, 100, 1.6f, 2.8f, "Sprites/scorpion_sheet");
+        var boss = new EnemyDefinition("해충 군주", 500000, 300, 100, 1.6f, 2.8f, "Sprites/scorpion_sheet");
         boss.isBoss = true;
         return boss;
     }
 
     public static EnemyDefinition GetElite(int phase) {
         string[] sprites = { "Sprites/mantis_sheet", "Sprites/spider_sheet", "Sprites/wasp_sheet", "Sprites/scorpion_sheet", "Sprites/centipede_sheet" };
-        int index = (phase - 1) % sprites.Length;
-        int health = 20 + phase * 8;
-        int attack = 2 + phase / 5;
-        int defense = phase / 10;
-        float scale = 1.1f + phase * 0.01f;
-        EnemyDefinition elite = new EnemyDefinition("엘리트 " + phase, health, attack, defense, 2.4f, scale, sprites[index]);
+        var index = (phase - 1) % sprites.Length;
+        var health = 20 + phase * 8;
+        var attack = 2 + phase / 5;
+        var defense = phase / 10;
+        var scale = 1.1f + phase * 0.01f;
+        var elite = new EnemyDefinition("엘리트 " + phase, health, attack, defense, 2.4f, scale, sprites[index]);
         elite.isElite = true;
         if (sprites[index] == "Sprites/spider_sheet") {
             elite.spawnsWeb = true;
@@ -68,8 +68,8 @@ public static class EnemyTable {
     public static EnemyDefinition GetMidBoss(int tier) {
         string[] names = { "지네 여왕", "사마귀 장군", "독거미 마님", "말벌 여왕" };
         string[] sprites = { "Sprites/centipede_sheet", "Sprites/mantis_sheet", "Sprites/spider_sheet", "Sprites/wasp_sheet" };
-        int index = Mathf.Clamp(tier - 1, 0, 3);
-        EnemyDefinition midBoss = new EnemyDefinition(names[index], 100 * tier, 3 + tier, tier, 2.2f, 1.4f + tier * 0.15f, sprites[index]);
+        var index = Mathf.Clamp(tier - 1, 0, 3);
+        var midBoss = new EnemyDefinition(names[index], 100 * tier, 3 + tier, tier, 2.2f, 1.4f + tier * 0.15f, sprites[index]);
         midBoss.isBoss = true;
         return midBoss;
     }
@@ -85,9 +85,9 @@ public static class EnemyTable {
     }
 
     public static EnemyDefinition PickForTime(float elapsedSeconds) {
-        int unlockedCount = 1 + Mathf.FloorToInt(elapsedSeconds / 20f);
+        var unlockedCount = 1 + Mathf.FloorToInt(elapsedSeconds / 20f);
         unlockedCount = Mathf.Clamp(unlockedCount, 1, Definitions.Length);
-        int pickIndex = Random.Range(0, unlockedCount);
+        var pickIndex = Random.Range(0, unlockedCount);
         return Definitions[pickIndex];
     }
 }

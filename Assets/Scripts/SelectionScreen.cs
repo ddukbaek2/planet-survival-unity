@@ -15,9 +15,9 @@ public class SelectionScreen : MonoBehaviour {
 
     private int selectedIndex = -1;
 
-    void Start() {
-        for (int index = 0; index < optionButtons.Length; index++) {
-            int capturedIndex = index;
+    private void Start() {
+        for (var index = 0; index < optionButtons.Length; index++) {
+            var capturedIndex = index;
             optionButtons[index].onClick.AddListener(delegate {
                 OnOptionClicked(capturedIndex);
             });
@@ -29,7 +29,7 @@ public class SelectionScreen : MonoBehaviour {
         UpdateHighlight();
     }
 
-    void OnOptionClicked(int index) {
+    private void OnOptionClicked(int index) {
         selectedIndex = index;
         UpdateHighlight();
         if (confirmButton != null) {
@@ -37,14 +37,14 @@ public class SelectionScreen : MonoBehaviour {
         }
     }
 
-    void UpdateHighlight() {
-        for (int index = 0; index < optionButtons.Length; index++) {
-            float scale = index == selectedIndex ? 1.12f : 1f;
+    private void UpdateHighlight() {
+        for (var index = 0; index < optionButtons.Length; index++) {
+            var scale = index == selectedIndex ? 1.12f : 1f;
             optionButtons[index].transform.localScale = new Vector3(scale, scale, 1f);
         }
     }
 
-    void OnConfirmClicked() {
+    private void OnConfirmClicked() {
         if (selectedIndex < 0) {
             return;
         }

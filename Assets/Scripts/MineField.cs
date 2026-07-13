@@ -13,11 +13,11 @@ public class MineField : MonoBehaviour {
         radius = fieldRadius;
         duration = fieldDuration;
         tickInterval = interval;
-        float diameter = radius * 2f;
+        var diameter = radius * 2f;
         transform.localScale = new Vector3(diameter, diameter, 1f);
     }
 
-    void Update() {
+    private void Update() {
         lifeTimer += Time.deltaTime;
         tickTimer -= Time.deltaTime;
         if (tickTimer <= 0f) {
@@ -29,13 +29,13 @@ public class MineField : MonoBehaviour {
         }
     }
 
-    void DamageEnemies() {
-        Collider[] hits = Physics.OverlapSphere(transform.position, radius);
-        for (int index = 0; index < hits.Length; index++) {
+    private void DamageEnemies() {
+        var hits = Physics.OverlapSphere(transform.position, radius);
+        for (var index = 0; index < hits.Length; index++) {
             if (!hits[index].CompareTag("Enemy")) {
                 continue;
             }
-            Enemy enemy = hits[index].GetComponent<Enemy>();
+            var enemy = hits[index].GetComponent<Enemy>();
             if (enemy != null) {
                 enemy.ApplyHit(attackPower);
             }

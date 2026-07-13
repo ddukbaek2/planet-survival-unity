@@ -12,13 +12,13 @@ public class BossMissile : MonoBehaviour {
         damage = missileDamage;
     }
 
-    void Update() {
+    private void Update() {
         elapsed += Time.deltaTime;
         if (elapsed >= lifeTime || target == null) {
             Object.Destroy(gameObject);
             return;
         }
-        Vector3 direction = target.position - transform.position;
+        var direction = target.position - transform.position;
         direction.y = 0f;
         if (direction.sqrMagnitude > 0.001f) {
             direction = direction.normalized;
@@ -26,11 +26,11 @@ public class BossMissile : MonoBehaviour {
         }
     }
 
-    void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         if (!other.CompareTag("Player")) {
             return;
         }
-        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+        var playerHealth = other.GetComponent<PlayerHealth>();
         if (playerHealth != null) {
             playerHealth.ApplyHit(damage);
         }

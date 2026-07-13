@@ -8,10 +8,10 @@ public class FloatingText : MonoBehaviour {
     private TMPro.TextMeshPro textMesh;
     private Color baseColor = Color.white;
 
-    void Awake() {
+    private void Awake() {
         textMesh = GetComponent<TMPro.TextMeshPro>();
         transform.localScale = transform.localScale * 0.5f;
-        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        var meshRenderer = GetComponent<MeshRenderer>();
         if (meshRenderer != null) {
             meshRenderer.sortingOrder = 30000;
         }
@@ -30,12 +30,12 @@ public class FloatingText : MonoBehaviour {
         }
     }
 
-    void Update() {
+    private void Update() {
         elapsedTime += Time.deltaTime;
         transform.position += new Vector3(0f, 0f, riseSpeed * Time.deltaTime);
-        float progress = Mathf.Clamp01(elapsedTime / lifeTime);
+        var progress = Mathf.Clamp01(elapsedTime / lifeTime);
         if (textMesh != null) {
-            Color currentColor = baseColor;
+            var currentColor = baseColor;
             currentColor.a = 1f - progress;
             textMesh.color = currentColor;
         }

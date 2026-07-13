@@ -23,27 +23,27 @@ public class PlayerController : MonoBehaviour {
         }
     }
 
-    void Update() {
+    private void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             HideJoystick();
             return;
         }
-        Pointer pointer = Pointer.current;
+        var pointer = Pointer.current;
         if (pointer == null) {
             return;
         }
-        bool isPressed = pointer.press.isPressed;
+        var isPressed = pointer.press.isPressed;
         if (!isPressed) {
             isDragging = false;
             HideJoystick();
             return;
         }
-        Vector2 pointerPosition = pointer.position.ReadValue();
+        var pointerPosition = pointer.position.ReadValue();
         if (!isDragging) {
             isDragging = true;
             dragOrigin = pointerPosition;
         }
-        Vector2 dragVector = pointerPosition - dragOrigin;
+        var dragVector = pointerPosition - dragOrigin;
         if (dragVector.magnitude > joystickRadius) {
             dragVector = dragVector.normalized * joystickRadius;
         }
@@ -51,16 +51,16 @@ public class PlayerController : MonoBehaviour {
         if (dragVector.magnitude < dragDeadzonePixels) {
             return;
         }
-        Vector2 dragDirection = dragVector.normalized;
-        Vector3 moveDirection = new Vector3(dragDirection.x, 0f, dragDirection.y);
+        var dragDirection = dragVector.normalized;
+        var moveDirection = new Vector3(dragDirection.x, 0f, dragDirection.y);
         transform.rotation = Quaternion.LookRotation(moveDirection);
-        float effectiveSpeed = slowSourceCount > 0 ? moveSpeed * 0.5f : moveSpeed;
-        Vector3 nextPosition = transform.position + moveDirection * effectiveSpeed * Time.deltaTime;
+        var effectiveSpeed = slowSourceCount > 0 ? moveSpeed * 0.5f : moveSpeed;
+        var nextPosition = transform.position + moveDirection * effectiveSpeed * Time.deltaTime;
         nextPosition.y = transform.position.y;
         transform.position = nextPosition;
     }
 
-    void UpdateJoystickVisual(Vector2 dragVector) {
+    private void UpdateJoystickVisual(Vector2 dragVector) {
         if (joystickBase == null) {
             return;
         }
@@ -69,12 +69,12 @@ public class PlayerController : MonoBehaviour {
         }
         joystickBase.position = new Vector3(dragOrigin.x, dragOrigin.y, 0f);
         if (joystickKnob != null) {
-            Vector2 knobPosition = dragOrigin + dragVector;
+            var knobPosition = dragOrigin + dragVector;
             joystickKnob.position = new Vector3(knobPosition.x, knobPosition.y, 0f);
         }
     }
 
-    void HideJoystick() {
+    private void HideJoystick() {
         if (joystickBase != null && joystickBase.gameObject.activeSelf) {
             joystickBase.gameObject.SetActive(false);
         }

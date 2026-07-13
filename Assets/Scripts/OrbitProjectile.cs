@@ -17,25 +17,25 @@ public class OrbitProjectile : MonoBehaviour {
         currentAngle = startAngle;
     }
 
-    void Start() {
+    private void Start() {
         Object.Destroy(gameObject, lifeTime);
     }
 
-    void Update() {
+    private void Update() {
         if (centerTransform == null) {
             return;
         }
         currentAngle += angularSpeed * Time.deltaTime;
-        float radians = currentAngle * Mathf.Deg2Rad;
-        Vector3 offset = new Vector3(Mathf.Cos(radians), 0f, Mathf.Sin(radians)) * radius;
+        var radians = currentAngle * Mathf.Deg2Rad;
+        var offset = new Vector3(Mathf.Cos(radians), 0f, Mathf.Sin(radians)) * radius;
         transform.position = centerTransform.position + offset;
     }
 
-    void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         if (!other.CompareTag("Enemy")) {
             return;
         }
-        Enemy enemy = other.GetComponent<Enemy>();
+        var enemy = other.GetComponent<Enemy>();
         if (enemy != null) {
             enemy.ApplyHit(attackPower);
         }

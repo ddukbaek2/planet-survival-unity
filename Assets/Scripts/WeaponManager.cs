@@ -13,7 +13,7 @@ public class WeaponManager : MonoBehaviour {
     private readonly Dictionary<WeaponType, float> cooldownTimers = new Dictionary<WeaponType, float>();
     private PlayerHealth playerHealth;
 
-    void Start() {
+    private void Start() {
         playerHealth = GetComponent<PlayerHealth>();
         AddWeapon(WeaponType.StraightShot);
     }
@@ -45,91 +45,91 @@ public class WeaponManager : MonoBehaviour {
         return 0;
     }
 
-    void Update() {
+    private void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
         }
-        for (int index = 0; index < ownedWeapons.Count; index++) {
-            WeaponType weaponType = ownedWeapons[index];
+        for (var index = 0; index < ownedWeapons.Count; index++) {
+            var weaponType = ownedWeapons[index];
             cooldownTimers[weaponType] = cooldownTimers[weaponType] - Time.deltaTime;
             if (cooldownTimers[weaponType] > 0f) {
                 continue;
             }
             cooldownTimers[weaponType] = GetCooldown(weaponType);
-            int weaponLevel = weaponLevels[weaponType];
+            var weaponLevel = weaponLevels[weaponType];
             FireWeapon(weaponType, weaponLevel);
         }
     }
 
-    float GetCooldown(WeaponType weaponType) {
-        float baseCooldown = WeaponDatabase.GetCooldown(weaponType);
-        int weaponLevel = GetWeaponLevel(weaponType);
-        int levelSteps = Mathf.Max(0, weaponLevel - 1);
-        float perLevelFactor = 0.9f;
+    private float GetCooldown(WeaponType weaponType) {
+        var baseCooldown = WeaponDatabase.GetCooldown(weaponType);
+        var weaponLevel = GetWeaponLevel(weaponType);
+        var levelSteps = Mathf.Max(0, weaponLevel - 1);
+        var perLevelFactor = 0.9f;
         if (weaponType == WeaponType.Mine) {
             perLevelFactor = 0.8f;
         }
         else if (weaponType == WeaponType.StraightShot) {
             perLevelFactor = 0.85f;
         }
-        float scaledCooldown = baseCooldown * Mathf.Pow(perLevelFactor, levelSteps);
+        var scaledCooldown = baseCooldown * Mathf.Pow(perLevelFactor, levelSteps);
         return Mathf.Max(0.1f, scaledCooldown);
     }
 
-    int GetAttackPower(WeaponType weaponType) {
-        int playerAttack = playerHealth != null ? playerHealth.GetAttackPower() : 3;
-        float multiplier = WeaponDatabase.GetDamageMultiplier(weaponType);
+    private int GetAttackPower(WeaponType weaponType) {
+        var playerAttack = playerHealth != null ? playerHealth.GetAttackPower() : 3;
+        var multiplier = WeaponDatabase.GetDamageMultiplier(weaponType);
         return Mathf.Max(1, Mathf.RoundToInt(playerAttack * multiplier));
     }
 
-    void FireWeapon(WeaponType weaponType, int weaponLevel) {
-        int attackPower = GetAttackPower(weaponType);
+    private void FireWeapon(WeaponType weaponType, int weaponLevel) {
+        var attackPower = GetAttackPower(weaponType);
         switch (weaponType) {
             case WeaponType.StraightShot: {
-                Vector3 direction = GetForwardDirection();
+                var direction = GetForwardDirection();
                 SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 break;
             }
             case WeaponType.AimedShot: {
-                Vector3 direction = GetNearestDirection();
+                var direction = GetNearestDirection();
                 SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 break;
             }
             case WeaponType.HomingMissile: {
-                Vector3 direction = GetNearestDirection();
+                var direction = GetNearestDirection();
                 SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Homing, 0, 0f);
                 break;
             }
             case WeaponType.SpreadShot: {
-                Vector3 direction = GetNearestDirection();
-                int pelletCount = 3 + (weaponLevel - 1);
-                float spreadDegrees = 30f;
-                for (int index = 0; index < pelletCount; index++) {
-                    float ratio = pelletCount == 1 ? 0f : ((float)index / (pelletCount - 1) - 0.5f);
-                    float angle = ratio * spreadDegrees;
-                    Vector3 pelletDirection = Quaternion.Euler(0f, angle, 0f) * direction;
+                var direction = GetNearestDirection();
+                var pelletCount = 3 + (weaponLevel - 1);
+                var spreadDegrees = 30f;
+                for (var index = 0; index < pelletCount; index++) {
+                    var ratio = pelletCount == 1 ? 0f : ((float)index / (pelletCount - 1) - 0.5f);
+                    var angle = ratio * spreadDegrees;
+                    var pelletDirection = Quaternion.Euler(0f, angle, 0f) * direction;
                     SpawnProjectile(pelletDirection, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 }
                 break;
             }
             case WeaponType.NovaBurst: {
-                int novaCount = 8 + (weaponLevel - 1) * 2;
-                for (int index = 0; index < novaCount; index++) {
-                    float angle = 360f * index / novaCount;
-                    Vector3 novaDirection = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
+                var novaCount = 8 + (weaponLevel - 1) * 2;
+                for (var index = 0; index < novaCount; index++) {
+                    var angle = 360f * index / novaCount;
+                    var novaDirection = Quaternion.Euler(0f, angle, 0f) * Vector3.forward;
                     SpawnProjectile(novaDirection, attackPower, Projectile.ProjectileMode.Straight, 0, 0f);
                 }
                 break;
             }
             case WeaponType.Boomerang: {
-                Vector3 direction = GetNearestDirection();
+                var direction = GetNearestDirection();
                 SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Boomerang, 999, 0f);
                 break;
             }
             case WeaponType.OrbitOrb: {
-                int orbCount = weaponLevel;
-                for (int index = 0; index < orbCount; index++) {
-                    float startAngle = 360f * index / orbCount;
+                var orbCount = weaponLevel;
+                for (var index = 0; index < orbCount; index++) {
+                    var startAngle = 360f * index / orbCount;
                     SpawnOrbit(startAngle, attackPower);
                 }
                 break;
@@ -143,7 +143,7 @@ public class WeaponManager : MonoBehaviour {
                 break;
             }
             case WeaponType.ExplosiveShot: {
-                Vector3 direction = GetNearestDirection();
+                var direction = GetNearestDirection();
                 SpawnProjectile(direction, attackPower, Projectile.ProjectileMode.Straight, 0, 2.2f);
                 break;
             }
@@ -153,8 +153,8 @@ public class WeaponManager : MonoBehaviour {
         }
     }
 
-    Vector3 GetForwardDirection() {
-        Vector3 forwardDirection = transform.forward;
+    private Vector3 GetForwardDirection() {
+        var forwardDirection = transform.forward;
         forwardDirection.y = 0f;
         if (forwardDirection.sqrMagnitude < 0.001f) {
             return Vector3.forward;
@@ -162,12 +162,12 @@ public class WeaponManager : MonoBehaviour {
         return forwardDirection.normalized;
     }
 
-    Vector3 GetNearestDirection() {
-        Enemy nearestEnemy = GetNearestEnemy();
+    private Vector3 GetNearestDirection() {
+        var nearestEnemy = GetNearestEnemy();
         if (nearestEnemy == null) {
             return GetForwardDirection();
         }
-        Vector3 direction = nearestEnemy.transform.position - transform.position;
+        var direction = nearestEnemy.transform.position - transform.position;
         direction.y = 0f;
         if (direction.sqrMagnitude < 0.001f) {
             return GetForwardDirection();
@@ -175,13 +175,13 @@ public class WeaponManager : MonoBehaviour {
         return direction.normalized;
     }
 
-    Enemy GetNearestEnemy() {
-        Enemy[] enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+    private Enemy GetNearestEnemy() {
+        var enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
         Enemy nearestEnemy = null;
-        float nearestDistance = targetingRange * targetingRange;
-        Vector3 currentPosition = transform.position;
-        for (int index = 0; index < enemies.Length; index++) {
-            float distance = (enemies[index].transform.position - currentPosition).sqrMagnitude;
+        var nearestDistance = targetingRange * targetingRange;
+        var currentPosition = transform.position;
+        for (var index = 0; index < enemies.Length; index++) {
+            var distance = (enemies[index].transform.position - currentPosition).sqrMagnitude;
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearestEnemy = enemies[index];
@@ -190,8 +190,8 @@ public class WeaponManager : MonoBehaviour {
         return nearestEnemy;
     }
 
-    void SpawnProjectile(Vector3 direction, int attackPower, Projectile.ProjectileMode projectileMode, int pierce, float explosion) {
-        Quaternion spawnRotation = Quaternion.LookRotation(direction);
+    private void SpawnProjectile(Vector3 direction, int attackPower, Projectile.ProjectileMode projectileMode, int pierce, float explosion) {
+        var spawnRotation = Quaternion.LookRotation(direction);
         Projectile projectile;
         if (ProjectilePool.Instance != null) {
             projectile = ProjectilePool.Instance.Get(transform.position, spawnRotation);
@@ -200,7 +200,7 @@ public class WeaponManager : MonoBehaviour {
             if (projectilePrefab == null) {
                 return;
             }
-            GameObject projectileObject = Object.Instantiate(projectilePrefab, transform.position, spawnRotation);
+            var projectileObject = Object.Instantiate(projectilePrefab, transform.position, spawnRotation);
             projectile = projectileObject.GetComponent<Projectile>();
         }
         if (projectile != null) {
@@ -208,41 +208,41 @@ public class WeaponManager : MonoBehaviour {
         }
     }
 
-    void SpawnOrbit(float startAngle, int attackPower) {
+    private void SpawnOrbit(float startAngle, int attackPower) {
         if (orbitPrefab == null) {
             return;
         }
-        GameObject orbitObject = Object.Instantiate(orbitPrefab, transform.position, Quaternion.identity);
-        OrbitProjectile orbit = orbitObject.GetComponent<OrbitProjectile>();
+        var orbitObject = Object.Instantiate(orbitPrefab, transform.position, Quaternion.identity);
+        var orbit = orbitObject.GetComponent<OrbitProjectile>();
         if (orbit != null) {
             orbit.Configure(transform, 2.6f, 100f, attackPower, 4f, startAngle);
         }
     }
 
-    void SpawnSweep(int weaponLevel, int attackPower) {
+    private void SpawnSweep(int weaponLevel, int attackPower) {
         if (sweepPrefab == null) {
             return;
         }
-        Vector3 spawnPosition = transform.position;
+        var spawnPosition = transform.position;
         spawnPosition.y = 0.06f;
-        GameObject sweepObject = Object.Instantiate(sweepPrefab, spawnPosition, Quaternion.Euler(90f, 0f, 0f));
-        SweepAttack sweep = sweepObject.GetComponent<SweepAttack>();
+        var sweepObject = Object.Instantiate(sweepPrefab, spawnPosition, Quaternion.Euler(90f, 0f, 0f));
+        var sweep = sweepObject.GetComponent<SweepAttack>();
         if (sweep != null) {
-            float sweepRadius = 5f + weaponLevel;
+            var sweepRadius = 5f + weaponLevel;
             sweep.Configure(attackPower, sweepRadius, 0.3f);
         }
     }
 
-    void SpawnMine(int weaponLevel, int attackPower) {
+    private void SpawnMine(int weaponLevel, int attackPower) {
         if (minePrefab == null) {
             return;
         }
-        Vector3 spawnPosition = transform.position;
+        var spawnPosition = transform.position;
         spawnPosition.y = 0.05f;
-        GameObject mineObject = Object.Instantiate(minePrefab, spawnPosition, Quaternion.Euler(90f, 0f, 0f));
-        MineField mine = mineObject.GetComponent<MineField>();
+        var mineObject = Object.Instantiate(minePrefab, spawnPosition, Quaternion.Euler(90f, 0f, 0f));
+        var mine = mineObject.GetComponent<MineField>();
         if (mine != null) {
-            float mineRadius = 1.3f * Mathf.Pow(1.2f, Mathf.Max(0, weaponLevel - 1));
+            var mineRadius = 1.3f * Mathf.Pow(1.2f, Mathf.Max(0, weaponLevel - 1));
             mine.Configure(attackPower, mineRadius, 4f, 0.5f);
         }
     }

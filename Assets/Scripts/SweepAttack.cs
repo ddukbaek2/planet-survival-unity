@@ -14,18 +14,18 @@ public class SweepAttack : MonoBehaviour {
         duration = sweepDuration;
     }
 
-    void Update() {
+    private void Update() {
         elapsedTime += Time.deltaTime;
-        float progress = Mathf.Clamp01(elapsedTime / duration);
-        float currentRadius = maxRadius * progress;
-        float diameter = currentRadius * 2f;
+        var progress = Mathf.Clamp01(elapsedTime / duration);
+        var currentRadius = maxRadius * progress;
+        var diameter = currentRadius * 2f;
         transform.localScale = new Vector3(diameter, diameter, 1f);
-        Collider[] hits = Physics.OverlapSphere(transform.position, currentRadius);
-        for (int index = 0; index < hits.Length; index++) {
+        var hits = Physics.OverlapSphere(transform.position, currentRadius);
+        for (var index = 0; index < hits.Length; index++) {
             if (!hits[index].CompareTag("Enemy")) {
                 continue;
             }
-            Enemy enemy = hits[index].GetComponent<Enemy>();
+            var enemy = hits[index].GetComponent<Enemy>();
             if (enemy != null && !hitEnemies.Contains(enemy)) {
                 hitEnemies.Add(enemy);
                 enemy.ApplyHit(attackPower);

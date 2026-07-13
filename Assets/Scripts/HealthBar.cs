@@ -9,7 +9,7 @@ public class HealthBar : MonoBehaviour {
     private Transform backgroundTransform;
     private static readonly Quaternion flatRotation = Quaternion.Euler(90f, 0f, 0f);
 
-    void Awake() {
+    private void Awake() {
         anchorTransform = transform.parent;
         fillTransform = transform.Find("Fill");
         backgroundTransform = transform.Find("Background");
@@ -22,31 +22,31 @@ public class HealthBar : MonoBehaviour {
         if (backgroundTransform == null) {
             backgroundTransform = transform.Find("Background");
         }
-        float clampedRatio = Mathf.Clamp01(ratio);
-        bool visible = ratio > 0f && ratio < 1f;
+        var clampedRatio = Mathf.Clamp01(ratio);
+        var visible = ratio > 0f && ratio < 1f;
         if (backgroundTransform != null) {
             backgroundTransform.gameObject.SetActive(visible);
         }
         if (fillTransform != null) {
             fillTransform.gameObject.SetActive(visible);
-            Vector3 fillScale = fillTransform.localScale;
+            var fillScale = fillTransform.localScale;
             fillScale.x = barWidth * clampedRatio;
             fillTransform.localScale = fillScale;
-            Vector3 fillPosition = fillTransform.localPosition;
+            var fillPosition = fillTransform.localPosition;
             fillPosition.x = -barWidth * 0.5f * (1f - clampedRatio);
             fillTransform.localPosition = fillPosition;
         }
     }
 
-    void LateUpdate() {
+    private void LateUpdate() {
         if (anchorTransform == null) {
             return;
         }
         transform.position = anchorTransform.position + Vector3.Scale(worldOffset, anchorTransform.lossyScale);
         transform.rotation = flatRotation;
-        float parentScale = anchorTransform.lossyScale.x;
+        var parentScale = anchorTransform.lossyScale.x;
         if (parentScale > 0.0001f) {
-            float inverseScale = 1f / parentScale;
+            var inverseScale = 1f / parentScale;
             transform.localScale = new Vector3(inverseScale, inverseScale, inverseScale);
         }
     }

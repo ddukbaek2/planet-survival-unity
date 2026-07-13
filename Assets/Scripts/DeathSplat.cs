@@ -11,7 +11,7 @@ public class DeathSplat : MonoBehaviour {
     private float timer;
     private int currentFrame = -1;
 
-    void Awake() {
+    private void Awake() {
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null) {
             spriteRenderer.sortingOrder = -1;
@@ -19,15 +19,15 @@ public class DeathSplat : MonoBehaviour {
         LoadFrames();
     }
 
-    void LoadFrames() {
-        Sprite[] loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
-        for (int index = 0; index < loadedSprites.Length; index++) {
-            string spriteName = loadedSprites[index].name;
-            int underscoreIndex = spriteName.LastIndexOf('_');
+    private void LoadFrames() {
+        var loadedSprites = Resources.LoadAll<Sprite>(resourcePath);
+        for (var index = 0; index < loadedSprites.Length; index++) {
+            var spriteName = loadedSprites[index].name;
+            var underscoreIndex = spriteName.LastIndexOf('_');
             if (underscoreIndex < 0) {
                 continue;
             }
-            string numberText = spriteName.Substring(underscoreIndex + 1);
+            var numberText = spriteName.Substring(underscoreIndex + 1);
             int frameIndex;
             if (int.TryParse(numberText, out frameIndex) && frameIndex >= 0 && frameIndex < frames.Length) {
                 frames[frameIndex] = loadedSprites[index];
@@ -38,21 +38,21 @@ public class DeathSplat : MonoBehaviour {
         }
     }
 
-    void Update() {
+    private void Update() {
         if (spriteRenderer == null || frameCount == 0) {
             Object.Destroy(gameObject);
             return;
         }
         timer += Time.deltaTime;
-        int index = Mathf.FloorToInt(timer / frameDuration);
+        var index = Mathf.FloorToInt(timer / frameDuration);
         if (index >= frameCount) {
-            float overTime = timer - frameCount * frameDuration;
+            var overTime = timer - frameCount * frameDuration;
             if (overTime >= lingerTime) {
                 Object.Destroy(gameObject);
                 return;
             }
             SetFrame(frameCount - 1);
-            Color color = spriteRenderer.color;
+            var color = spriteRenderer.color;
             color.a = 1f - (overTime / lingerTime);
             spriteRenderer.color = color;
             return;
@@ -60,7 +60,7 @@ public class DeathSplat : MonoBehaviour {
         SetFrame(index);
     }
 
-    void SetFrame(int index) {
+    private void SetFrame(int index) {
         if (index == currentFrame) {
             return;
         }

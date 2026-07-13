@@ -8,7 +8,7 @@ public class PlayerHealth : MonoBehaviour {
     private int currentHealth;
     private HealthBar healthBar;
 
-    void Awake() {
+    private void Awake() {
         currentHealth = maxHealth;
         healthBar = GetComponentInChildren<HealthBar>();
         if (healthBar != null) {
@@ -32,7 +32,7 @@ public class PlayerHealth : MonoBehaviour {
         maxHealth += amount;
         currentHealth += amount;
         if (healthBar != null) {
-            float ratio = (float)currentHealth / maxHealth;
+            var ratio = (float)currentHealth / maxHealth;
             healthBar.SetRatio(ratio);
         }
     }
@@ -49,14 +49,14 @@ public class PlayerHealth : MonoBehaviour {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
         }
-        int damage = CombatFormula.ComputeDamage(incomingAttack, defense);
+        var damage = CombatFormula.ComputeDamage(incomingAttack, defense);
         currentHealth -= damage;
         if (currentHealth < 0) {
             currentHealth = 0;
         }
         CombatText.Show(transform.position + new Vector3(0f, 0f, 0.8f), damage, new Color(1f, 0.15f, 0.15f));
         if (healthBar != null) {
-            float ratio = (float)currentHealth / maxHealth;
+            var ratio = (float)currentHealth / maxHealth;
             healthBar.SetRatio(ratio);
         }
         if (currentHealth <= 0) {

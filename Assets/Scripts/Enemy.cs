@@ -32,7 +32,7 @@ public class Enemy : MonoBehaviour {
     private EnemySprite enemySprite;
     private EnemySpawner spawner;
 
-    void Awake() {
+    private void Awake() {
         currentHealth = maxHealth;
         healthBar = GetComponentInChildren<HealthBar>();
         enemySprite = GetComponentInChildren<EnemySprite>();
@@ -86,7 +86,7 @@ public class Enemy : MonoBehaviour {
         level = value;
     }
 
-    void Update() {
+    private void Update() {
         if (GameManager.Instance != null && GameManager.Instance.IsGameOver()) {
             return;
         }
@@ -97,41 +97,41 @@ public class Enemy : MonoBehaviour {
         if (targetTransform == null) {
             return;
         }
-        Vector3 currentPosition = transform.position;
-        Vector3 targetPosition = targetTransform.position;
-        Vector3 moveDirection = targetPosition - currentPosition;
+        var currentPosition = transform.position;
+        var targetPosition = targetTransform.position;
+        var moveDirection = targetPosition - currentPosition;
         moveDirection.y = 0f;
         moveDirection = moveDirection.normalized;
         if (!isBoss && (Time.frameCount + separationPhase) % 3 == 0) {
             cachedSeparation = ComputeSeparation();
         }
-        Vector3 desiredDirection = moveDirection + cachedSeparation;
+        var desiredDirection = moveDirection + cachedSeparation;
         if (desiredDirection.sqrMagnitude > 0.0001f) {
             desiredDirection = desiredDirection.normalized;
         }
         else {
             desiredDirection = moveDirection;
         }
-        float currentSpeed = moveSpeed;
+        var currentSpeed = moveSpeed;
         if (isBoss) {
             currentSpeed = UpdateBossPattern();
         }
         transform.position = currentPosition + desiredDirection * currentSpeed * Time.deltaTime;
     }
 
-    Vector3 ComputeSeparation() {
-        float personalSpace = 0.8f * transform.localScale.x;
-        Vector3 selfPosition = transform.position;
-        int count = Physics.OverlapSphereNonAlloc(selfPosition, personalSpace, separationBuffer);
-        Vector3 push = Vector3.zero;
-        for (int index = 0; index < count; index++) {
-            Enemy other = separationBuffer[index].GetComponentInParent<Enemy>();
+    private Vector3 ComputeSeparation() {
+        var personalSpace = 0.8f * transform.localScale.x;
+        var selfPosition = transform.position;
+        var count = Physics.OverlapSphereNonAlloc(selfPosition, personalSpace, separationBuffer);
+        var push = Vector3.zero;
+        for (var index = 0; index < count; index++) {
+            var other = separationBuffer[index].GetComponentInParent<Enemy>();
             if (other == null || other == this) {
                 continue;
             }
-            Vector3 away = selfPosition - other.transform.position;
+            var away = selfPosition - other.transform.position;
             away.y = 0f;
-            float distance = away.magnitude;
+            var distance = away.magnitude;
             if (distance > 0.001f && distance < personalSpace) {
                 push += away.normalized * ((personalSpace - distance) / personalSpace);
             }
@@ -139,9 +139,9 @@ public class Enemy : MonoBehaviour {
         return push;
     }
 
-    float UpdateBossPattern() {
-        float deltaTime = Time.deltaTime;
-        float speed = moveSpeed;
+    private float UpdateBossPattern() {
+        var deltaTime = Time.deltaTime;
+        var speed = moveSpeed;
         if (dashing) {
             dashRemaining -= deltaTime;
             speed = moveSpeed * 2.6f;
@@ -170,45 +170,45 @@ public class Enemy : MonoBehaviour {
         return speed;
     }
 
-    void FireBossMissiles() {
+    private void FireBossMissiles() {
         if (targetTransform == null) {
             return;
         }
-        for (int index = 0; index < 3; index++) {
-            GameObject missile = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        for (var index = 0; index < 3; index++) {
+            var missile = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             missile.name = "BossMissile";
-            Vector3 missilePosition = transform.position;
+            var missilePosition = transform.position;
             missilePosition.y = 0.4f;
-            float angle = (index - 1) * 25f;
-            Vector3 offset = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * 0.8f;
+            var angle = (index - 1) * 25f;
+            var offset = Quaternion.Euler(0f, angle, 0f) * Vector3.forward * 0.8f;
             missile.transform.position = missilePosition + offset;
             missile.transform.localScale = new Vector3(0.35f, 0.35f, 0.35f);
-            Renderer missileRenderer = missile.GetComponent<Renderer>();
+            var missileRenderer = missile.GetComponent<Renderer>();
             if (missileRenderer != null) {
                 missileRenderer.material.SetColor("_BaseColor", new Color(0.6f, 0.1f, 0.7f));
                 missileRenderer.material.EnableKeyword("_EMISSION");
                 missileRenderer.material.SetColor("_EmissionColor", new Color(0.6f, 0.1f, 0.8f));
             }
-            SphereCollider missileCollider = missile.GetComponent<SphereCollider>();
+            var missileCollider = missile.GetComponent<SphereCollider>();
             if (missileCollider != null) {
                 missileCollider.isTrigger = true;
             }
-            Rigidbody missileBody = missile.AddComponent<Rigidbody>();
+            var missileBody = missile.AddComponent<Rigidbody>();
             missileBody.isKinematic = true;
             missileBody.useGravity = false;
-            BossMissile bossMissile = missile.AddComponent<BossMissile>();
+            var bossMissile = missile.AddComponent<BossMissile>();
             bossMissile.Configure(targetTransform, attackPower);
         }
     }
 
-    void EmitShockwave() {
-        float shockRadius = 3f * transform.localScale.x;
-        Collider[] hits = Physics.OverlapSphere(transform.position, shockRadius);
-        for (int index = 0; index < hits.Length; index++) {
+    private void EmitShockwave() {
+        var shockRadius = 3f * transform.localScale.x;
+        var hits = Physics.OverlapSphere(transform.position, shockRadius);
+        for (var index = 0; index < hits.Length; index++) {
             if (!hits[index].CompareTag("Player")) {
                 continue;
             }
-            PlayerHealth playerHealth = hits[index].GetComponent<PlayerHealth>();
+            var playerHealth = hits[index].GetComponent<PlayerHealth>();
             if (playerHealth != null) {
                 playerHealth.ApplyHit(attackPower);
             }
@@ -216,11 +216,11 @@ public class Enemy : MonoBehaviour {
     }
 
     public void ApplyHit(int incomingAttack) {
-        int damage = CombatFormula.ComputeDamage(incomingAttack, defense);
+        var damage = CombatFormula.ComputeDamage(incomingAttack, defense);
         currentHealth -= damage;
         CombatText.Show(transform.position, damage, Color.white);
         if (healthBar != null) {
-            float ratio = (float)currentHealth / maxHealth;
+            var ratio = (float)currentHealth / maxHealth;
             healthBar.SetRatio(ratio);
         }
         if (isBoss && BossBar.Instance != null) {
@@ -231,7 +231,7 @@ public class Enemy : MonoBehaviour {
         }
     }
 
-    void Die() {
+    private void Die() {
         if (GameManager.Instance != null) {
             GameManager.Instance.AddKill();
             GameManager.Instance.AddMoney(1 * level);
@@ -246,43 +246,43 @@ public class Enemy : MonoBehaviour {
         Object.Destroy(gameObject);
     }
 
-    void SpawnRewardItem() {
-        GameObject reward = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+    private void SpawnRewardItem() {
+        var reward = GameObject.CreatePrimitive(PrimitiveType.Sphere);
         reward.name = "RewardItem";
-        Vector3 rewardPosition = transform.position;
+        var rewardPosition = transform.position;
         rewardPosition.y = 0.5f;
         reward.transform.position = rewardPosition;
         reward.transform.localScale = new Vector3(0.7f, 0.7f, 0.7f);
-        Renderer rewardRenderer = reward.GetComponent<Renderer>();
+        var rewardRenderer = reward.GetComponent<Renderer>();
         if (rewardRenderer != null) {
             rewardRenderer.material.SetColor("_BaseColor", new Color(1f, 0.85f, 0.2f));
             rewardRenderer.material.EnableKeyword("_EMISSION");
             rewardRenderer.material.SetColor("_EmissionColor", new Color(1f, 0.7f, 0.1f));
         }
-        SphereCollider rewardCollider = reward.GetComponent<SphereCollider>();
+        var rewardCollider = reward.GetComponent<SphereCollider>();
         if (rewardCollider != null) {
             rewardCollider.isTrigger = true;
             rewardCollider.radius = 1.5f;
         }
-        Rigidbody rewardBody = reward.AddComponent<Rigidbody>();
+        var rewardBody = reward.AddComponent<Rigidbody>();
         rewardBody.isKinematic = true;
         rewardBody.useGravity = false;
         reward.AddComponent<RewardItem>();
     }
 
-    void SpawnDeathSplat() {
-        GameObject splatObject = new GameObject("DeathSplat");
-        Vector3 splatPosition = transform.position;
+    private void SpawnDeathSplat() {
+        var splatObject = new GameObject("DeathSplat");
+        var splatPosition = transform.position;
         splatPosition.y = 0.06f;
         splatObject.transform.position = splatPosition;
         splatObject.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-        float splatScale = transform.localScale.x * 2f;
+        var splatScale = transform.localScale.x * 2f;
         splatObject.transform.localScale = new Vector3(splatScale, splatScale, splatScale);
         splatObject.AddComponent<SpriteRenderer>();
         splatObject.AddComponent<DeathSplat>();
     }
 
-    void HandleWeb() {
+    private void HandleWeb() {
         webTimer -= Time.deltaTime;
         if (webTimer <= 0f) {
             webTimer = 4f;
@@ -290,24 +290,24 @@ public class Enemy : MonoBehaviour {
         }
     }
 
-    void SpawnWeb() {
-        GameObject web = new GameObject("WebZone");
-        Vector3 webPosition = transform.position;
+    private void SpawnWeb() {
+        var web = new GameObject("WebZone");
+        var webPosition = transform.position;
         webPosition.y = 0.05f;
         web.transform.position = webPosition;
         web.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
         web.transform.localScale = new Vector3(2.2f, 2.2f, 2.2f);
         web.AddComponent<SpriteRenderer>();
-        SphereCollider webCollider = web.AddComponent<SphereCollider>();
+        var webCollider = web.AddComponent<SphereCollider>();
         webCollider.isTrigger = true;
         webCollider.radius = 0.5f;
-        Rigidbody webBody = web.AddComponent<Rigidbody>();
+        var webBody = web.AddComponent<Rigidbody>();
         webBody.isKinematic = true;
         webBody.useGravity = false;
         web.AddComponent<WebZone>();
     }
 
-    void HandleContactDamage() {
+    private void HandleContactDamage() {
         if (!touchingPlayer || contactPlayerHealth == null) {
             return;
         }
@@ -318,11 +318,11 @@ public class Enemy : MonoBehaviour {
         }
     }
 
-    void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         if (!other.CompareTag("Player")) {
             return;
         }
-        PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+        var playerHealth = other.GetComponent<PlayerHealth>();
         if (playerHealth == null) {
             return;
         }
@@ -332,7 +332,7 @@ public class Enemy : MonoBehaviour {
         attackCooldown = attackInterval;
     }
 
-    void OnTriggerExit(Collider other) {
+    private void OnTriggerExit(Collider other) {
         if (!other.CompareTag("Player")) {
             return;
         }
@@ -340,7 +340,7 @@ public class Enemy : MonoBehaviour {
         contactPlayerHealth = null;
     }
 
-    void OnDestroy() {
+    private void OnDestroy() {
         ActiveCount -= 1;
         if (ActiveCount < 0) {
             ActiveCount = 0;

@@ -44,7 +44,7 @@ public class Projectile : MonoBehaviour {
         moveDirection = direction.normalized;
     }
 
-    void Update() {
+    private void Update() {
         elapsedTime += Time.deltaTime;
         if (elapsedTime >= lifeTime) {
             ReleaseSelf();
@@ -63,31 +63,31 @@ public class Projectile : MonoBehaviour {
         transform.position += moveDirection * speed * Time.deltaTime;
     }
 
-    void UpdateHoming() {
+    private void UpdateHoming() {
         if (homingTarget == null) {
             homingTarget = FindNearestEnemy();
         }
         if (homingTarget == null) {
             return;
         }
-        Vector3 desiredDirection = homingTarget.position - transform.position;
+        var desiredDirection = homingTarget.position - transform.position;
         desiredDirection.y = 0f;
         if (desiredDirection.sqrMagnitude < 0.001f) {
             return;
         }
         desiredDirection = desiredDirection.normalized;
-        float maxRadians = HomingTurnDegreesPerSecond * Mathf.Deg2Rad * Time.deltaTime;
+        var maxRadians = HomingTurnDegreesPerSecond * Mathf.Deg2Rad * Time.deltaTime;
         moveDirection = Vector3.RotateTowards(moveDirection, desiredDirection, maxRadians, 0f).normalized;
         transform.rotation = Quaternion.LookRotation(moveDirection);
     }
 
-    Transform FindNearestEnemy() {
-        Enemy[] enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+    private Transform FindNearestEnemy() {
+        var enemies = Object.FindObjectsByType<Enemy>(FindObjectsSortMode.None);
         Transform nearest = null;
-        float nearestDistance = float.MaxValue;
-        Vector3 currentPosition = transform.position;
-        for (int index = 0; index < enemies.Length; index++) {
-            float distance = (enemies[index].transform.position - currentPosition).sqrMagnitude;
+        var nearestDistance = float.MaxValue;
+        var currentPosition = transform.position;
+        for (var index = 0; index < enemies.Length; index++) {
+            var distance = (enemies[index].transform.position - currentPosition).sqrMagnitude;
             if (distance < nearestDistance) {
                 nearestDistance = distance;
                 nearest = enemies[index].transform;
@@ -96,11 +96,11 @@ public class Projectile : MonoBehaviour {
         return nearest;
     }
 
-    void OnTriggerEnter(Collider other) {
+    private void OnTriggerEnter(Collider other) {
         if (!other.CompareTag("Enemy")) {
             return;
         }
-        Enemy enemy = other.GetComponent<Enemy>();
+        var enemy = other.GetComponent<Enemy>();
         if (enemy != null) {
             enemy.ApplyHit(attackPower);
         }
@@ -114,20 +114,20 @@ public class Projectile : MonoBehaviour {
         ReleaseSelf();
     }
 
-    void Explode() {
-        Collider[] hits = Physics.OverlapSphere(transform.position, explosionRadius);
-        for (int index = 0; index < hits.Length; index++) {
+    private void Explode() {
+        var hits = Physics.OverlapSphere(transform.position, explosionRadius);
+        for (var index = 0; index < hits.Length; index++) {
             if (!hits[index].CompareTag("Enemy")) {
                 continue;
             }
-            Enemy enemy = hits[index].GetComponent<Enemy>();
+            var enemy = hits[index].GetComponent<Enemy>();
             if (enemy != null) {
                 enemy.ApplyHit(attackPower);
             }
         }
     }
 
-    void ReleaseSelf() {
+    private void ReleaseSelf() {
         if (pool != null) {
             pool.Release(this);
         }

@@ -26,9 +26,9 @@ public class LevelUpUI : MonoBehaviour {
         new Color(0.5f, 0.7f, 1f)
     };
 
-    void Start() {
-        for (int index = 0; index < choiceButtons.Length; index++) {
-            int capturedIndex = index;
+    private void Start() {
+        for (var index = 0; index < choiceButtons.Length; index++) {
+            var capturedIndex = index;
             choiceButtons[index].onClick.AddListener(delegate {
                 OnChoiceClicked(capturedIndex);
             });
@@ -41,8 +41,8 @@ public class LevelUpUI : MonoBehaviour {
         }
     }
 
-    void Update() {
-        GameManager gameManager = GameManager.Instance;
+    private void Update() {
+        var gameManager = GameManager.Instance;
         if (gameManager == null) {
             return;
         }
@@ -54,7 +54,7 @@ public class LevelUpUI : MonoBehaviour {
         }
     }
 
-    void ShowChoices() {
+    private void ShowChoices() {
         isChoosing = true;
         Time.timeScale = 0f;
         if (panel != null) {
@@ -63,12 +63,12 @@ public class LevelUpUI : MonoBehaviour {
         ShowStatStage();
     }
 
-    void ShowStatStage() {
+    private void ShowStatStage() {
         isWeaponStage = false;
         if (titleLabel != null) {
             titleLabel.text = "레벨 업! 능력치 선택";
         }
-        for (int index = 0; index < currentChoices.Length; index++) {
+        for (var index = 0; index < currentChoices.Length; index++) {
             if (index < choiceIcons.Length && choiceIcons[index] != null) {
                 choiceIcons[index].color = StatIconColors[index];
             }
@@ -81,7 +81,7 @@ public class LevelUpUI : MonoBehaviour {
         }
     }
 
-    void ShowWeaponStage() {
+    private void ShowWeaponStage() {
         isWeaponStage = true;
         if (titleLabel != null) {
             titleLabel.text = "레벨 업! 무기 선택";
@@ -89,14 +89,14 @@ public class LevelUpUI : MonoBehaviour {
         RollChoices();
     }
 
-    void RollChoices() {
-        List<int> pool = new List<int>();
-        for (int index = 0; index < WeaponDatabase.WeaponCount; index++) {
+    private void RollChoices() {
+        var pool = new List<int>();
+        for (var index = 0; index < WeaponDatabase.WeaponCount; index++) {
             pool.Add(index);
         }
-        for (int index = 0; index < currentChoices.Length; index++) {
-            int pickIndex = Random.Range(0, pool.Count);
-            WeaponType weaponType = (WeaponType)pool[pickIndex];
+        for (var index = 0; index < currentChoices.Length; index++) {
+            var pickIndex = Random.Range(0, pool.Count);
+            var weaponType = (WeaponType)pool[pickIndex];
             pool.RemoveAt(pickIndex);
             currentChoices[index] = weaponType;
             if (index < choiceIcons.Length && choiceIcons[index] != null) {
@@ -106,14 +106,14 @@ public class LevelUpUI : MonoBehaviour {
                 choiceIconChars[index].text = WeaponDatabase.GetIconChar(weaponType);
             }
             if (index < choiceLabels.Length && choiceLabels[index] != null) {
-                int ownedLevel = weaponManager != null ? weaponManager.GetWeaponLevel(weaponType) : 0;
-                string suffix = ownedLevel > 0 ? " (Lv." + (ownedLevel + 1) + ")" : " (신규)";
+                var ownedLevel = weaponManager != null ? weaponManager.GetWeaponLevel(weaponType) : 0;
+                var suffix = ownedLevel > 0 ? " (Lv." + (ownedLevel + 1) + ")" : " (신규)";
                 choiceLabels[index].text = WeaponDatabase.GetDisplayName(weaponType) + suffix;
             }
         }
     }
 
-    void OnChoiceClicked(int index) {
+    private void OnChoiceClicked(int index) {
         if (!isWeaponStage) {
             ApplyStatChoice(index);
             ShowWeaponStage();
@@ -136,7 +136,7 @@ public class LevelUpUI : MonoBehaviour {
         Time.timeScale = 1f;
     }
 
-    void OnRandomAllClicked() {
+    private void OnRandomAllClicked() {
         while (GameManager.Instance != null && GameManager.Instance.HasPendingLevelUp()) {
             ApplyStatChoice(Random.Range(0, 3));
             if (weaponManager != null) {
@@ -151,7 +151,7 @@ public class LevelUpUI : MonoBehaviour {
         Time.timeScale = 1f;
     }
 
-    void ApplyStatChoice(int index) {
+    private void ApplyStatChoice(int index) {
         if (playerHealth == null) {
             return;
         }
