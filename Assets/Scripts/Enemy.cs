@@ -19,6 +19,7 @@ public class Enemy : MonoBehaviour {
     private bool dashing;
     private float shockTimer;
     private float missileTimer;
+    private float poisonTimer;
     private bool touchingPlayer;
     private PlayerHealth contactPlayerHealth;
     private float attackCooldown;
@@ -68,6 +69,7 @@ public class Enemy : MonoBehaviour {
             dashTimer = 4f;
             shockTimer = 5f;
             missileTimer = 3f;
+            poisonTimer = 6f;
             if (BossBar.Instance != null) {
                 BossBar.Instance.Show(this, bossName);
             }
@@ -167,7 +169,25 @@ public class Enemy : MonoBehaviour {
             missileTimer = 3f;
             FireBossMissiles();
         }
+        poisonTimer -= deltaTime;
+        if (poisonTimer <= 0f) {
+            poisonTimer = 7f;
+            SpawnPoisonRain();
+        }
         return speed;
+    }
+
+    private void SpawnPoisonRain() {
+        if (targetTransform == null) {
+            return;
+        }
+        var zoneObject = new GameObject("PoisonRainZone");
+        var zonePosition = targetTransform.position;
+        zonePosition.y = 0.05f;
+        zoneObject.transform.position = zonePosition;
+        var poisonRain = zoneObject.AddComponent<PoisonRainZone>();
+        var poisonAttack = Mathf.Max(1, Mathf.RoundToInt(attackPower * 0.1f));
+        poisonRain.Configure(3f, poisonAttack);
     }
 
     private void FireBossMissiles() {

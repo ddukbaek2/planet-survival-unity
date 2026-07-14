@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public struct EnemyDefinition {
@@ -89,5 +90,17 @@ public static class EnemyTable {
         unlockedCount = Mathf.Clamp(unlockedCount, 1, Definitions.Length);
         var pickIndex = Random.Range(0, unlockedCount);
         return Definitions[pickIndex];
+    }
+
+    public static List<EnemyDefinition> GetCodexEntries() {
+        var entries = new List<EnemyDefinition>();
+        for (var index = 0; index < Definitions.Length; index++) {
+            entries.Add(Definitions[index]);
+        }
+        for (var tier = 1; tier <= 4; tier++) {
+            entries.Add(GetMidBoss(tier));
+        }
+        entries.Add(GetBoss());
+        return entries;
     }
 }

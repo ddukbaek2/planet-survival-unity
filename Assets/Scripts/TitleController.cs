@@ -8,6 +8,7 @@ public class TitleController : MonoBehaviour {
     [SerializeField] private string nextSceneName = "CharacterSelect";
     [SerializeField] private Button stageModeButton;
     [SerializeField] private Button bossTrainingButton;
+    [SerializeField] private Button codexButton;
 
     private void Start() {
         var versionAsset = Resources.Load<TextAsset>("version");
@@ -20,6 +21,9 @@ public class TitleController : MonoBehaviour {
         if (bossTrainingButton != null) {
             bossTrainingButton.onClick.AddListener(OnBossTrainingClicked);
         }
+        if (codexButton != null) {
+            codexButton.onClick.AddListener(OnCodexClicked);
+        }
     }
 
     private void OnStageModeClicked() {
@@ -30,5 +34,9 @@ public class TitleController : MonoBehaviour {
     private void OnBossTrainingClicked() {
         GameSelection.BossTraining = true;
         SceneManager.LoadScene(nextSceneName);
+    }
+
+    private void OnCodexClicked() {
+        CodexController.Show();
     }
 }
