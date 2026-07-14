@@ -240,8 +240,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerSprite
   spriteRenderer: {fileID: 163226505}
-  resourcePath: Sprites/marine_blue_sheet_1
-  baseFrameIndex: 16
+  resourcePath: Sprites/ext_topdown_sheet
+  moveThreshold: 0.02
+  attackRange: 12
+  idleFrameDuration: 0.28
+  moveFrameDuration: 0.11
+  attackFrameDuration: 0.08
+  deathFrameDuration: 0.14
 --- !u!212 &163226505
 SpriteRenderer:
   serializedVersion: 2
