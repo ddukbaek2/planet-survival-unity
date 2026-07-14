@@ -40,6 +40,12 @@ public class EnemySpawner : MonoBehaviour {
                     StageAnnouncer.Show("B O S S", bossDefinition.displayName, new Color(1f, 0.24f, 0.24f));
                 }
             }
+            else if (phase % 10 == 0) {
+                var tier = phase / 10;
+                var midBossDefinition = EnemyTable.GetMidBoss(tier);
+                SpawnSpecial(midBossDefinition);
+                StageAnnouncer.Show("MID BOSS", midBossDefinition.displayName, new Color(0.85f, 0.4f, 1f));
+            }
             else {
                 var eliteDefinition = EnemyTable.GetElite(phase);
                 SpawnSpecial(eliteDefinition);
