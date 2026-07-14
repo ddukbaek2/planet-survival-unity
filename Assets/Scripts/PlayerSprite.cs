@@ -195,8 +195,10 @@ public class PlayerSprite : MonoBehaviour {
         moveDelta.y = 0f;
         lastPosition = currentPosition;
         isMoving = moveDelta.magnitude > moveThreshold;
-        if (isMoving) {
-            currentYaw = Mathf.Atan2(moveDelta.x, moveDelta.z) * Mathf.Rad2Deg;
+        var facingDirection = anchorTransform.forward;
+        facingDirection.y = 0f;
+        if (facingDirection.sqrMagnitude > 0.0001f) {
+            currentYaw = Mathf.Atan2(facingDirection.x, facingDirection.z) * Mathf.Rad2Deg;
         }
         transform.rotation = Quaternion.AngleAxis(currentYaw, Vector3.up) * flatRotation;
     }

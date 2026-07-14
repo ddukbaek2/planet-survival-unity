@@ -4898,7 +4898,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b361fa0dafdf53a45ae8afe97ecd6bd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 7
+  moveSpeed: 5
   dragDeadzonePixels: 12
   joystickBase: {fileID: 2108319874}
   joystickKnob: {fileID: 2002356799}
