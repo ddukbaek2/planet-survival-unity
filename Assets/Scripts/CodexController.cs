@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using TMPro;
 
 public class CodexController : MonoBehaviour {
-    public static CodexController Instance { get; private set; }
+    [SerializeField] private string titleSceneName = "Title";
 
-    private GameObject rootPanel;
     private Image enemyImage;
     private TMP_Text nameLabel;
     private TMP_Text typeLabel;
@@ -16,50 +16,12 @@ public class CodexController : MonoBehaviour {
     private TMP_FontAsset koreanFont;
     private List<EnemyDefinition> entries;
     private int currentIndex;
-    private bool built;
 
-    public static void Show() {
-        EnsureInstance();
-        Instance.Open();
-    }
-
-    private static void EnsureInstance() {
-        if (Instance != null) {
-            return;
-        }
-        var codexObject = new GameObject("CodexController");
-        codexObject.AddComponent<CodexController>();
-    }
-
-    private void Awake() {
-        if (Instance != null && Instance != this) {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-    }
-
-    private void OnDestroy() {
-        if (Instance == this) {
-            Instance = null;
-        }
-    }
-
-    private void Open() {
-        if (!built) {
-            BuildUserInterface();
-            built = true;
-        }
+    private void Start() {
+        BuildUserInterface();
         entries = EnemyTable.GetCodexEntries();
         currentIndex = 0;
-        rootPanel.SetActive(true);
         RefreshPage();
-    }
-
-    private void Close() {
-        if (rootPanel != null) {
-            rootPanel.SetActive(false);
-        }
     }
 
     private void BuildUserInterface() {
@@ -69,54 +31,50 @@ public class CodexController : MonoBehaviour {
         canvasObject.transform.SetParent(transform, false);
         var canvas = canvasObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 30000;
+        canvas.sortingOrder = 100;
         var scaler = canvasObject.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
         scaler.matchWidthOrHeight = 0.5f;
         canvasObject.AddComponent<GraphicRaycaster>();
-        rootPanel = canvasObject;
 
-        var background = CreateImage("Background", canvasObject.transform, new Color(0.06f, 0.07f, 0.09f, 0.97f));
+        var background = CreateImage("Background", canvasObject.transform, new Color(0.06f, 0.07f, 0.09f, 1f));
         StretchFull(background.rectTransform);
 
         var titleText = CreateText("Title", canvasObject.transform, "적 도감", 72f, FontStyles.Bold, TextAlignmentOptions.Center, new Color(0.85f, 0.95f, 0.7f));
-        SetRect(titleText.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, 420f), new Vector2(900f, 100f));
+        SetRect(titleText.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -80f), new Vector2(900f, 100f));
 
-        var card = CreateImage("Card", canvasObject.transform, new Color(0.12f, 0.14f, 0.18f, 1f));
-        SetRect(card.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, 20f), new Vector2(1220f, 620f));
+        var backButton = CreateButton("Back", canvasObject.transform, new Vector2(0f, 1f), "뒤로", new Vector2(160f, -70f), new Vector2(220f, 84f), new Color(0.4f, 0.2f, 0.22f, 1f));
+        backButton.onClick.AddListener(GoBack);
 
-        var imageFrame = CreateImage("ImageFrame", card.transform, new Color(0.08f, 0.1f, 0.13f, 1f));
-        SetRect(imageFrame.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(-360f, 30f), new Vector2(440f, 440f));
+        var imageFrame = CreateImage("ImageFrame", canvasObject.transform, new Color(0.1f, 0.12f, 0.16f, 1f));
+        SetRect(imageFrame.rectTransform, new Vector2(0.5f, 1f), new Vector2(-470f, -400f), new Vector2(440f, 440f));
 
         enemyImage = CreateImage("EnemyImage", imageFrame.transform, Color.white);
         enemyImage.preserveAspect = true;
         SetRect(enemyImage.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, 0f), new Vector2(400f, 400f));
 
-        nameLabel = CreateText("Name", card.transform, "", 60f, FontStyles.Bold, TextAlignmentOptions.Left, Color.white);
-        SetRect(nameLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(180f, 220f), new Vector2(820f, 90f));
+        nameLabel = CreateText("Name", canvasObject.transform, "", 62f, FontStyles.Bold, TextAlignmentOptions.Left, Color.white);
+        SetRect(nameLabel.rectTransform, new Vector2(0.5f, 1f), new Vector2(340f, -215f), new Vector2(920f, 84f));
 
-        typeLabel = CreateText("Type", card.transform, "", 36f, FontStyles.Bold, TextAlignmentOptions.Left, new Color(0.9f, 0.75f, 0.35f));
-        SetRect(typeLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(180f, 150f), new Vector2(820f, 50f));
+        typeLabel = CreateText("Type", canvasObject.transform, "", 38f, FontStyles.Bold, TextAlignmentOptions.Left, new Color(0.9f, 0.75f, 0.35f));
+        SetRect(typeLabel.rectTransform, new Vector2(0.5f, 1f), new Vector2(340f, -290f), new Vector2(920f, 52f));
 
-        statsLabel = CreateText("Stats", card.transform, "", 40f, FontStyles.Normal, TextAlignmentOptions.TopLeft, new Color(0.85f, 0.9f, 0.95f));
-        SetRect(statsLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(180f, -10f), new Vector2(820f, 300f));
+        statsLabel = CreateText("Stats", canvasObject.transform, "", 40f, FontStyles.Normal, TextAlignmentOptions.TopLeft, new Color(0.85f, 0.9f, 0.95f));
+        SetRect(statsLabel.rectTransform, new Vector2(0.5f, 1f), new Vector2(340f, -485f), new Vector2(920f, 300f));
 
-        skillsLabel = CreateText("Skills", card.transform, "", 34f, FontStyles.Normal, TextAlignmentOptions.TopLeft, new Color(0.7f, 0.95f, 0.75f));
-        SetRect(skillsLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, -245f), new Vector2(1140f, 120f));
+        skillsLabel = CreateText("Skills", canvasObject.transform, "", 34f, FontStyles.Normal, TextAlignmentOptions.TopLeft, new Color(0.7f, 0.95f, 0.75f));
+        SetRect(skillsLabel.rectTransform, new Vector2(0.5f, 1f), new Vector2(0f, -800f), new Vector2(1500f, 240f));
         skillsLabel.enableWordWrapping = true;
 
-        var previousButton = CreateButton("Prev", canvasObject.transform, "◀ 이전", new Vector2(-280f, -350f), new Vector2(220f, 84f), new Color(0.2f, 0.24f, 0.3f, 1f));
+        var previousButton = CreateButton("Prev", canvasObject.transform, new Vector2(0.5f, 0f), "이전", new Vector2(-300f, 74f), new Vector2(230f, 84f), new Color(0.2f, 0.24f, 0.3f, 1f));
         previousButton.onClick.AddListener(ShowPrevious);
 
         pageLabel = CreateText("Page", canvasObject.transform, "", 40f, FontStyles.Bold, TextAlignmentOptions.Center, Color.white);
-        SetRect(pageLabel.rectTransform, new Vector2(0.5f, 0.5f), new Vector2(0f, -350f), new Vector2(260f, 84f));
+        SetRect(pageLabel.rectTransform, new Vector2(0.5f, 0f), new Vector2(0f, 74f), new Vector2(280f, 84f));
 
-        var nextButton = CreateButton("Next", canvasObject.transform, "다음 ▶", new Vector2(280f, -350f), new Vector2(220f, 84f), new Color(0.2f, 0.24f, 0.3f, 1f));
+        var nextButton = CreateButton("Next", canvasObject.transform, new Vector2(0.5f, 0f), "다음", new Vector2(300f, 74f), new Vector2(230f, 84f), new Color(0.2f, 0.24f, 0.3f, 1f));
         nextButton.onClick.AddListener(ShowNext);
-
-        var closeButton = CreateButton("Close", canvasObject.transform, "✕ 닫기", new Vector2(760f, 430f), new Vector2(200f, 76f), new Color(0.4f, 0.18f, 0.2f, 1f));
-        closeButton.onClick.AddListener(Close);
     }
 
     private void RefreshPage() {
@@ -163,6 +121,10 @@ public class CodexController : MonoBehaviour {
         RefreshPage();
     }
 
+    private void GoBack() {
+        SceneManager.LoadScene(titleSceneName);
+    }
+
     private string GetTypeText(EnemyDefinition definition) {
         if (definition.isBoss) {
             return "보스";
@@ -184,12 +146,12 @@ public class CodexController : MonoBehaviour {
 
     private string GetSkillsText(EnemyDefinition definition) {
         if (definition.isBoss) {
-            return "• 돌진 — 짧게 가속해 플레이어에게 돌격\n• 충격파 — 주변에 광역 피해\n• 독침 미사일 — 유도 발사체 3발\n• 독액 비 — 장판에 독이 쏟아져 지속 피해";
+            return "- 돌진 : 짧게 가속해 플레이어에게 돌격\n- 충격파 : 주변에 광역 피해\n- 독침 미사일 : 유도 발사체 3발\n- 독액 비 : 장판에 독이 쏟아져 지속 피해";
         }
         if (definition.spawnsWeb) {
-            return "• 거미줄 — 이동 속도를 늦추는 지대를 주기적으로 생성";
+            return "- 거미줄 : 이동 속도를 늦추는 지대를 주기적으로 생성";
         }
-        return "특수 스킬 없음 — 접촉 시 피해";
+        return "특수 스킬 없음 (접촉 시 피해)";
     }
 
     private Sprite LoadEnemySprite(string resourcePath) {
@@ -236,14 +198,14 @@ public class CodexController : MonoBehaviour {
         return text;
     }
 
-    private Button CreateButton(string objectName, Transform parent, string label, Vector2 anchoredPosition, Vector2 size, Color backgroundColor) {
+    private Button CreateButton(string objectName, Transform parent, Vector2 anchor, string label, Vector2 anchoredPosition, Vector2 size, Color backgroundColor) {
         var buttonObject = new GameObject(objectName);
         buttonObject.transform.SetParent(parent, false);
         var buttonImage = buttonObject.AddComponent<Image>();
         buttonImage.color = backgroundColor;
         var button = buttonObject.AddComponent<Button>();
         button.targetGraphic = buttonImage;
-        SetRect(buttonImage.rectTransform, new Vector2(0.5f, 0.5f), anchoredPosition, size);
+        SetRect(buttonImage.rectTransform, anchor, anchoredPosition, size);
         var buttonLabel = CreateText("Label", buttonObject.transform, label, 36f, FontStyles.Bold, TextAlignmentOptions.Center, Color.white);
         StretchFull(buttonLabel.rectTransform);
         return button;

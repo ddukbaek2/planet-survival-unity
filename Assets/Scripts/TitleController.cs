@@ -6,6 +6,7 @@ using TMPro;
 public class TitleController : MonoBehaviour {
     [SerializeField] private TMP_Text versionText;
     [SerializeField] private string nextSceneName = "CharacterSelect";
+    [SerializeField] private string codexSceneName = "Codex";
     [SerializeField] private Button stageModeButton;
     [SerializeField] private Button bossTrainingButton;
     [SerializeField] private Button codexButton;
@@ -37,6 +38,6 @@ public class TitleController : MonoBehaviour {
     }
 
     private void OnCodexClicked() {
-        CodexController.Show();
+        SceneManager.LoadScene(codexSceneName);
     }
 }
