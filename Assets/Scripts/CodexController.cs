@@ -35,7 +35,7 @@ public class CodexController : MonoBehaviour {
         var scaler = canvasObject.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.matchWidthOrHeight = 0f;
         canvasObject.AddComponent<GraphicRaycaster>();
 
         var background = CreateImage("Background", canvasObject.transform, new Color(0.06f, 0.07f, 0.09f, 1f));
